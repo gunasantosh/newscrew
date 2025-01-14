@@ -1,5 +1,14 @@
-import HomePage from "./pages/HomePage";
 
-const App = () => <HomePage></HomePage>;
+import './App.css';
+import Newsapp from './components/NewsApp';
+
+function App() {
+  return (
+    <div>
+      <Newsapp/>
+      
+    </div>
+  );
+}
 
 export default App;

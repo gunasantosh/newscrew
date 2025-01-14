@@ -1,0 +1,351 @@
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background: #f4f6f9;
+  color: #333;
+  padding: 20px;
+}
+
+/* Navigation Bar */
+nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 40px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+nav h1 {
+  font-size: 2rem;
+  color: #0073e6;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.Search {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 15px 0;
+}
+
+.Search input {
+  width: 350px;
+  padding: 10px 15px;
+  border-radius: 25px;
+  border: 1px solid #dcdcdc;
+  font-size: 1rem;
+  outline: none;
+  margin-right: 10px;
+  transition: border-color 0.3s ease;
+}
+
+.Search input:focus {
+  border-color: #0073e6;
+}
+
+.Search button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  background: #0073e6;
+  color: #fff;
+  font-weight: bold;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.Search button:hover {
+  background: #005bb5;
+  transform: scale(1.05);
+}
+
+/* Category Buttons */
+.categorybtn {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.categorybtn button {
+  padding: 8px 15px;
+  border-radius: 20px;
+  border: 1px solid #0073e6;
+  background: #ffffff;
+  color: #0073e6;
+  font-size: 0.95rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.categorybtn button:hover {
+  background: #0073e6;
+  color: #ffffff;
+}
+
+/* News Cards Container */
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+/* Individual Card */
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-bottom: 1px solid #ddd;
+}
+
+.card-content {
+  padding: 15px;
+}
+
+.card-content h2 {
+  font-size: 1.2rem;
+  color: #0073e6;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.card-content p {
+  font-size: 0.95rem;
+  color: #555555;
+  line-height: 1.5;
+  margin-bottom: 15px;
+}
+
+.card-content a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.3s ease;
+}
+
+.card-content a:hover {
+  color: #005bb5;
+}
+
+.card-content button {
+  padding: 10px 20px;
+  border-radius: 25px;
+  border: none;
+  background: #0073e6;
+  color: #ffffff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.card-content button:hover {
+  background: #005bb5;
+  transform: scale(1.05);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .Search input {
+    width: 250px;
+  }
+
+  .card-container {
+    grid-template-columns: 1fr;
+  }
+}
+/* Form Styling */
+.form-container {
+  max-width: 400px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.form-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.form-container input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.form-container button {
+  width: 100%;
+  padding: 10px;
+  background-color: #0073e6;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.form-container button:hover {
+  background-color: #005bb5;
+}
+
+/* Auth Buttons */
+.auth-buttons {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.auth-buttons button {
+  margin: 0 10px;
+}
+/* Auth Button */
+.auth-buttons {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+}
+
+.auth-buttons button {
+  padding: 10px 20px;
+  background-color: #0073e6;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.auth-buttons button:hover {
+  background-color: #005bb5;
+}
+
+/* Auth Form Styles */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 50px;
+}
+
+.auth-form input {
+  padding: 10px;
+  margin: 10px;
+  width: 300px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.auth-form button {
+  padding: 10px 20px;
+  margin: 10px;
+  background-color: #0073e6;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.auth-form button:hover {
+  background-color: #005bb5;
+}
+
+.auth-form p a {
+  color: #0073e6;
+  text-decoration: none;
+}
+
+/* Newsletter Subscribe */
+.newsletter-subscribe {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px;
+}
+
+.newsletter-subscribe input {
+  padding: 10px;
+  margin: 10px;
+  width: 300px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.newsletter-subscribe button {
+  padding: 10px 20px;
+  background-color: #0073e6;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.newsletter-subscribe button:hover {
+  background-color: #005bb5;
+}
+/* Newsletter Subscribe Banner at the Top */
+.newsletter-banner {
+  background-color: #0073e6;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.newsletter-banner h2 {
+  font-size: 1.5rem;
+}
+
+.newsletter-form {
+  display: inline-block;
+  margin-top: 10px;
+}
+
+.newsletter-form input {
+  padding: 10px;
+  width: 250px;
+  border-radius: 5px;
+  border: none;
+}
+
+.newsletter-form button {
+  padding: 10px 20px;
+  background-color: white;
+  color: #0073e6;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.newsletter-form button:hover {
+  background-color: #005bb5;
+  color: white;
+}
