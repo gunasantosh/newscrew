@@ -1,40 +1,32 @@
-import {
-  AppBar,
-  Box,
-  Button,
-  IconButton,
-  Toolbar,
-  Typography,
-} from "@mui/material";
-import NewspaperIcon from "@mui/icons-material/Newspaper";
+import { Button, ButtonGroup, AppBar, Toolbar, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
-function AppAppBar() {
+function LandingPage() {
+  const navigate = useNavigate(); // Initialize navigate function
+
+  // Function to handle login button click
+  const handleLoginClick = () => {
+    navigate('/login'); // Redirect to Signin page
+  };
+  const handleSignupClick = () => {
+    navigate('/signup'); // Redirect to Signin page
+  };
+
   return (
-    <AppBar position="static">
-      <Toolbar>
-        <IconButton
-          size="large"
-          edge="start"
-          color="inherit"
-          aria-label="logo"
-          sx={{ display: { xs: "none", md: "flex" } }}
-        >
-          <NewspaperIcon />
-        </IconButton>
-        <Typography
-          variant="h6"
-          component={"div"}
-          sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}
-        >
-          NewsCrew
-        </Typography>
-        <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-          <Button color="inherit">Sign Up</Button>
-          <Button color="inherit">Login</Button>
-        </Box>
-      </Toolbar>
-    </AppBar>
+    <div>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" style={{ flexGrow: 1 }}>
+            NewsCrew
+          </Typography>
+          <ButtonGroup variant="outlined" color="inherit">
+            <Button onClick={handleSignupClick}>Sign Up</Button>
+            <Button onClick={handleLoginClick}>Login</Button> {/* Button triggers the redirection */}
+          </ButtonGroup>
+        </Toolbar>
+      </AppBar>
+    </div>
   );
 }
 
-export default AppAppBar;
+export default LandingPage;
