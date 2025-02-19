@@ -7,7 +7,7 @@ function Hero() {
   const [topic, setTopic] = useState("");
   const [errors, setErrors] = useState({ email: "", topic: "" });
   const [message, setMessage] = useState(null);
-  const [messageType, setMessageType] = useState("success"); // "success" or "error"
+  const [messageType, setMessageType] = useState("success"); 
 
   const validateEmail = (email) => {
     return /^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/.test(email);
@@ -50,7 +50,7 @@ function Hero() {
         }
       } catch (error) {
         if (error.response) {
-          setMessage(error.response.data.message || "Subscription failed.");
+          setMessage(error.response.data.email[0] || "Subscription failed.");
           setMessageType("error");
         } else {
           setMessage("Something went wrong. Please try again.");
