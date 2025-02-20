@@ -1,114 +1,75 @@
-import { Box, TextField, Button, Typography, Alert } from "@mui/material";
-import { useState } from "react";
-import axios from "axios";
+import { Box, Typography, TextField, Button } from "@mui/material";
+import heroVideo from "../assets/hero_background.mp4";
+import { motion } from "framer-motion";
 
-function Hero() {
-  const [email, setEmail] = useState("");
-  const [topic, setTopic] = useState("");
-  const [errors, setErrors] = useState({ email: "", topic: "" });
-  const [message, setMessage] = useState(null);
-  const [messageType, setMessageType] = useState("success"); 
-
-  const validateEmail = (email) => {
-    return /^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/.test(email);
-  };
-
-  const validateTopic = (topic) => {
-    return /^[a-zA-Z ]+$/.test(topic);
-  };
-
-  const handleSubscribe = async () => {
-    let newErrors = { email: "", topic: "" };
-    setMessage(null);
-
-    if (!email) {
-      newErrors.email = "Email is required";
-    } else if (!validateEmail(email)) {
-      newErrors.email = "Enter a valid email";
-    }
-
-    if (!topic) {
-      newErrors.topic = "Topic is required";
-    } else if (!validateTopic(topic)) {
-      newErrors.topic = "Topic should contain only letters and spaces";
-    }
-
-    setErrors(newErrors);
-
-    if (!newErrors.email && !newErrors.topic) {
-      try {
-        const response = await axios.post("http://127.0.0.1:8000/api/subscribe/", {
-          email,
-          topic
-        });
-
-        if (response.status === 201) {
-          setMessage("Successfully subscribed!");
-          setMessageType("success");
-          setEmail("");
-          setTopic("");
-        }
-      } catch (error) {
-        if (error.response) {
-          setMessage(error.response.data.email[0] || "Subscription failed.");
-          setMessageType("error");
-        } else {
-          setMessage("Something went wrong. Please try again.");
-          setMessageType("error");
-        }
-      }
-    }
-  };
-
+const Hero = () => {
   return (
-    <Box 
-      sx={{ 
-        backgroundColor: "#f5f5f5", 
-        minHeight: "40vh", 
-        display: "flex", 
-        flexDirection: "column", 
-        alignItems: "center", 
-        justifyContent: "center", 
-        textAlign: "center", 
-        gap: 2,
-        padding: 3
-      }}
-    >
-      <Typography variant="h4" fontWeight="bold">
-        Subscribe to our Newsletter!
-      </Typography>
+    <Box sx={{ position: "relative", height: "80vh", overflow: "hidden" }}>
+      {/* Background Video */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={{
+          position: "absolute",
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          zIndex: -1,
+        }}
+      >
+        <source src={heroVideo} type="video/mp4" />
+      </video>
 
-      {message && (
-        <Alert severity={messageType} sx={{ width: "50%" }}>
-          {message}
-        </Alert>
-      )}
+      {/* Gradient Overlay */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          background: "linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          textAlign: "center",
+          color: "#fff",
+          px: 3,
+        }}
+      >
+        <Typography variant="h3" fontWeight="bold">
+          Stay Informed with <span style={{ color: "#FF4D4D" }}>NewsCrew</span>
+        </Typography>
+        <Typography variant="h6" sx={{ mt: 2, maxWidth: "600px" }}>
+          Subscribe to stay updated with the latest news and articles.
+        </Typography>
 
-      <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", justifyContent: "center" }}>
-        <TextField 
-          label="Enter your email" 
-          variant="outlined" 
-          value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
-          error={!!errors.email}
-          helperText={errors.email}
-          sx={{ width: "250px" }}
-        />
-        <TextField 
-          label="Enter topic of interest" 
-          variant="outlined" 
-          value={topic} 
-          onChange={(e) => setTopic(e.target.value)} 
-          error={!!errors.topic}
-          helperText={errors.topic}
-          sx={{ width: "250px" }}
-        />
-        <Button variant="contained" color="primary" sx={{ height: "56px" }} onClick={handleSubscribe}>
-          Subscribe
-        </Button>
+        <Box sx={{ display: "flex", gap: 2, mt: 3 }}>
+          <TextField
+            variant="outlined"
+            label="Email"
+            sx={{ backgroundColor: "#fff", borderRadius: 1, width: "250px" }}
+          />
+          <TextField
+            variant="outlined"
+            label="Topic"
+            sx={{ backgroundColor: "#fff", borderRadius: 1, width: "200px" }}
+          />
+          <Button
+            component={motion.button}
+            whileHover={{ scale: 1.1 }}
+            variant="contained"
+            sx={{ bgcolor: "#FF4D4D", px: 4, py: 1.5, borderRadius: "30px" }}
+          >
+            Subscribe
+          </Button>
+        </Box>
       </Box>
     </Box>
   );
-}
+};
 
 export default Hero;

@@ -1,18 +1,16 @@
-import AppAppBar from "../components/AppAppBar"
-import Divider from '@mui/material/Divider';
+import { Box } from "@mui/material";
+import AppAppBar from "../components/AppAppBar";
 import Hero from "../components/Hero";
-import NewsletterList from "../components/NewsLetterList";
+import NewsletterList from "../components/NewsletterList";
 
-function LandingPage() {
+const LandingPage = () => {
   return (
-    <>
-    <AppAppBar />
-    <Divider />
-    <Hero />
-    <Divider />
-    <NewsletterList />
-    </>
-  )
-}
+    <Box>
+      <AppAppBar />
+      <Hero />
+      <NewsletterList />
+    </Box>
+  );
+};
 
-export default LandingPage
+export default LandingPage;

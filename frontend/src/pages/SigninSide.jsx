@@ -1,106 +1,74 @@
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
-import Paper from '@mui/material/Paper';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import LockOutlined from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
-import { styled } from '@mui/material/styles';
-import newscrew from "../assets/newscrew.jpg";
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
+import CssBaseline from "@mui/material/CssBaseline";
+import TextField from "@mui/material/TextField";
+import Link from "@mui/material/Link";
+import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import LockOutlined from "@mui/icons-material/LockOutlined";
+import Typography from "@mui/material/Typography";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Alert } from "@mui/material";
+import { motion } from "framer-motion";
+import newscrew1 from "../assets/newscrew1.jpg";
 
-// Create axios instance with default config
+// Axios instance
 const api = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: "http://127.0.0.1:8000/api",
+  headers: { "Content-Type": "application/json" },
 });
 
-// Add axios interceptor to add token to subsequent requests
+// Attach auth token if available
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('authToken');
+  const token = localStorage.getItem("authToken");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="http://localhost:5173/">
-        NewsCrew
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+const Copyright = () => (
+  <Typography variant="body2" sx={{ color: "rgba(255, 255, 255, 0.6)", textAlign: "center" }}>
+    {"Copyright © "}
+    <Link color="inherit" href="http://localhost:5173/">
+      NewsCrew
+    </Link>{" "}
+    {new Date().getFullYear()}
+    {"."}
+  </Typography>
+);
 
-const StyledPaper = styled('div')(({ theme }) => ({
-  margin: theme.spacing(8, 4),
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-}));
 
-const StyledAvatar = styled(Avatar)(({ theme }) => ({
-  margin: theme.spacing(1),
-  backgroundColor: theme.palette.secondary.main,
-}));
-
-const StyledForm = styled('form')(({ theme }) => ({
-  width: '100%',
-  marginTop: theme.spacing(1),
-}));
-
-const SubmitButton = styled(Button)(({ theme }) => ({
-  margin: theme.spacing(3, 0, 2),
-}));
 
 export default function SigninSide() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-  });
-  const [error, setError] = useState('');
+  const [formData, setFormData] = useState({ username: "", password: "" });
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Handle input change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
-      const response = await api.post('/login/', formData);
-      
-      // Store the token
-      localStorage.setItem('authToken', response.data.token);
-      
-      // Redirect to dashboard
-      navigate('/dashboard');
+      const response = await api.post("/login/", formData);
+      localStorage.setItem("authToken", response.data.token);
+      navigate("/dashboard");
     } catch (err) {
+      console.error("Login Error:", err.response?.data || err.message);
       setError(
-        err.response?.data?.message || 
-        'An error occurred during login. Please try again.'
+        err.response?.data?.message || "Login failed. Please check your credentials."
       );
     } finally {
       setLoading(false);
@@ -108,38 +76,71 @@ export default function SigninSide() {
   };
 
   return (
-    <Grid container component="main" sx={{ height: '100vh' }}>
+    <Grid container component="main" sx={{ height: "100vh" }}>
       <CssBaseline />
+
+      {/* Left Side Background */}
       <Grid
         item
         xs={false}
         sm={4}
         md={7}
         sx={{
-          backgroundImage: `url(${newscrew})`,
-          backgroundRepeat: 'no-repeat',
-          backgroundColor: (theme) =>
-            theme.palette.mode === 'light'
-              ? theme.palette.grey[50]
-              : theme.palette.grey[900],
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundImage: `url(${newscrew1})`,
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          position: "relative",
         }}
-      />
-      <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-        <StyledPaper>
-          <StyledAvatar>
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background: "linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%)",
+          }}
+        />
+      </Grid>
+
+      {/* Right Side Form */}
+      <Grid
+        item
+        xs={12}
+        sm={8}
+        md={5}
+        component={Paper}
+        elevation={6}
+        square
+        sx={{
+          backgroundColor: "#222",
+          color: "#fff",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Box sx={{ width: "80%", maxWidth: "400px", textAlign: "center" }}>
+          <Avatar sx={{ m: 1, bgcolor: "#FF4D4D", mx: "auto" }}>
             <LockOutlined />
-          </StyledAvatar>
-          <Typography component="h1" variant="h5">
-            Sign in
+          </Avatar>
+
+          <Typography variant="h5" fontWeight="bold">
+            Sign In to <span style={{ color: "#FF4D4D" }}>NewsCrew</span>
           </Typography>
+
+          {/* Error Message */}
           {error && (
-            <Typography color="error" sx={{ mt: 2 }}>
+            <Alert severity="error" sx={{ mt: 2, width: "100%" }}>
               {error}
-            </Typography>
+            </Alert>
           )}
-          <StyledForm noValidate onSubmit={handleSubmit}>
+
+          {/* Login Form */}
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3, textAlign: "center" }}>
             <TextField
               variant="outlined"
               margin="normal"
@@ -153,7 +154,13 @@ export default function SigninSide() {
               value={formData.username}
               onChange={handleInputChange}
               disabled={loading}
+              sx={{
+                backgroundColor: "#fff",
+                borderRadius: "5px",
+                "& .MuiOutlinedInput-root": { borderRadius: "10px" },
+              }}
             />
+
             <TextField
               variant="outlined"
               margin="normal"
@@ -167,37 +174,47 @@ export default function SigninSide() {
               value={formData.password}
               onChange={handleInputChange}
               disabled={loading}
+              sx={{
+                backgroundColor: "#fff",
+                borderRadius: "5px",
+                "& .MuiOutlinedInput-root": { borderRadius: "10px" },
+              }}
             />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
-            <SubmitButton
+
+            <Button
               type="submit"
               fullWidth
               variant="contained"
-              color="primary"
+              sx={{
+                bgcolor: "#FF4D4D",
+                color: "#fff",
+                mt: 2,
+                py: 1.5,
+                borderRadius: "30px",
+                fontWeight: "bold",
+                "&:hover": { bgcolor: "#D93636" },
+              }}
+              component={motion.button}
+              whileHover={{ scale: 1.1 }}
               disabled={loading}
             >
-              {loading ? 'Signing in...' : 'Sign In'}
-            </SubmitButton>
-            <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
-              </Grid>
+              {loading ? "Signing in..." : "Sign In"}
+            </Button>
+
+            <Grid container justifyContent="center" sx={{ mt: 2 }}>
               <Grid item>
-                <Link href="/signup" variant="body2">
+                <Link href="/signup" variant="body2" sx={{ color: "#FF4D4D" }}>
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>
             </Grid>
-            <Box mt={5}>
+
+            {/* Copyright Text */}
+            <Box sx={{ mt: 4 }}>
               <Copyright />
             </Box>
-          </StyledForm>
-        </StyledPaper>
+          </Box>
+        </Box>
       </Grid>
     </Grid>
   );
