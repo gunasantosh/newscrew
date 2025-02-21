@@ -1,5 +1,5 @@
 from django.urls import path
-from api.views import NewsAPIView, RegisterAPIView, LoginAPIView, FetchNewslettersAPIView, GetTopicNewslettersAPIView, RenderNewsletterAPIView, SendNewsletterAPIView, LatestNewslettersAPIView, SubscriptionAPIView
+from api.views import NewsAPIView, RegisterAPIView, LoginAPIView, FetchNewslettersAPIView, GetTopicNewslettersAPIView, RenderNewsletterAPIView, SendNewsletterAPIView, LatestNewslettersAPIView, SubscriptionAPIView, DashboardAPIView
 
 
 urlpatterns = [
@@ -12,5 +12,5 @@ urlpatterns = [
     path('send-newsletter/', SendNewsletterAPIView.as_view(), name='send-newsletter'),
     path('latest-newsletters/', LatestNewslettersAPIView.as_view(), name='latest-newsletters'),
     path('subscribe/', SubscriptionAPIView.as_view(), name='subscribe'),
-
+    path('dashboard/', DashboardAPIView.as_view(), name='dashboard'),
 ]

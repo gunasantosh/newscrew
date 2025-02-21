@@ -216,3 +216,23 @@ class SubscriptionAPIView(APIView):
             return Response({'message': f'Subscribed successfully with {email} & {topic}'}, status=201)
         
         return Response(serializer.errors, status=400)
+    
+
+class DashboardAPIView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        total_newsletters = Newsletter.objects.count()
+        total_subscriptions = Subscription.objects.count()
+        all_users_table = User.objects.all().values('username', 'email', 'date_joined', 'last_login')
+        all_subs_table = Subscription.objects.all().values('email', 'topic')
+        articles = Newsletter.objects.all().values('filename','content','created_at')
+
+        return Response({
+            "total_newsletters": total_newsletters,
+            "total_subscriptions": total_subscriptions,
+            "all_users": all_users_table,
+            "all_subscriptions": all_subs_table,
+            "articles": articles
+        }, status=200)

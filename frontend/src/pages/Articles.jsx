@@ -1,5 +1,7 @@
+
 import { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
+import ReactMarkdown from 'react-markdown';
 import {
   Box,
   Drawer,
@@ -13,9 +15,10 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Grid,
   Paper,
   Container,
+  Table, TableBody,
+  TableCell, TableContainer, TableHead, TableRow,Button, Dialog, DialogTitle, DialogContent, DialogActions
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -101,15 +104,24 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(2),
   display: 'flex',
   flexDirection: 'column',
-  height: 240,
+  height: 500,
   backgroundColor: colorPalette.gradient.end, // Apply gradient end color to Paper
   color: colorPalette.text, // Apply white text color
 }));
 
+
+
 export default function Dashboard() {
   const [open, setOpen] = useState(true);
-  const [userData, setUserData] = useState(null);
-  const [dashboardData, setDashboardData] = useState({ total_newsletters: 0, total_subscriptions: 0 });
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedArticle, setSelectedArticle] = useState(null);
+  const [dashboardData, setDashboardData] = useState({
+    total_newsletters: 0,
+    total_subscriptions: 0,
+    all_users: [],
+    all_subscriptions: [],
+    articles:[]
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -120,39 +132,11 @@ export default function Dashboard() {
     try {
       const token = localStorage.getItem('authToken');
       const response = await axios.get('http://127.0.0.1:8000/api/dashboard/', {
-        headers: {
-          Authorization: `Token ${token}` // Send token using Token instead of Bearer
-        }
+        headers: { Authorization: `Token ${token}` }
       });
       setDashboardData(response.data);
     } catch (error) {
-      console.error('Error fetching dashboard data:', error.detail);
-    }
-  };
-
-  useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      navigate('/login');  // Redirect if no token found
-    } else {
-      fetchUserData();
-    }
-  }, []);
-
-  const fetchUserData = async () => {
-    try {
-      const response = await axios.get('http://127.0.0.1/api/user/profile', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`
-        }
-      });
-      setUserData(response.data);
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-      if (error.response?.status === 401) {
-        localStorage.removeItem('authToken');  // Clear invalid token
-        navigate('/login');  // Redirect to login
-      }
+      console.error('Error fetching dashboard data:', error);
     }
   };
 
@@ -176,6 +160,16 @@ export default function Dashboard() {
     }
     localStorage.removeItem('authToken');
     navigate('/login');
+  };
+
+  const handleViewArticle = (article) => {
+    setSelectedArticle(article);
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedArticle(null);
   };
 
   const menuItems = [
@@ -259,39 +253,45 @@ export default function Dashboard() {
       <Main open={open}>
         <DrawerHeader />
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <StyledPaper>
-                {/* Updated Heading with Color Styling */}
-                <Typography variant="h4" gutterBottom>
-                  <span style={{ color: colorPalette.text }}>NEWS</span>
-                  <span style={{ color: colorPalette.primary }}>CREW</span>
-                </Typography>
-                <Typography variant="body1">
-                  This is your NewsCrew dashboard. You can manage your articles, view statistics, and more.
-                </Typography>
-              </StyledPaper>
-            </Grid>
+        <StyledPaper>
+        <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Filename</TableCell>
+              <TableCell>Created At</TableCell>
+              <TableCell>Action</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {dashboardData.articles.map((article, index) => (
+              <TableRow key={index}>
+                <TableCell>{article.filename}</TableCell>
+                <TableCell>{new Date(article.created_at).toLocaleString()}</TableCell>
+                <TableCell>
+                  <Button variant="contained" color="primary" onClick={() => handleViewArticle(article)}>
+                    View
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      </StyledPaper>
 
-            <Grid item xs={12} md={4}>
-              <StyledPaper>
-                <Typography variant="h6">Total Articles</Typography>
-                <Typography variant="h3">{dashboardData.total_newsletters}</Typography>
-              </StyledPaper>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <StyledPaper>
-                <Typography variant="h6">Total Subscriptions</Typography>
-                <Typography variant="h3">{dashboardData.total_subscriptions}</Typography>
-              </StyledPaper>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <StyledPaper>
-                <Typography variant="h6">Draft Articles</Typography>
-                <Typography variant="h3">{userData?.draftArticles || 0}</Typography>
-              </StyledPaper>
-            </Grid>
-          </Grid>
+      {/* Dialog for Viewing Article Content */}
+      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
+        <DialogTitle>{selectedArticle?.filename}</DialogTitle>
+        <DialogContent>
+          <ReactMarkdown>{selectedArticle?.content}</ReactMarkdown>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
         </Container>
       </Main>
     </Box>

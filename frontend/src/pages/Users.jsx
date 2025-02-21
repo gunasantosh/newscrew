@@ -16,6 +16,8 @@ import {
   Grid,
   Paper,
   Container,
+  Table, TableBody,
+  TableCell, TableContainer, TableHead, TableRow
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -108,8 +110,12 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 
 export default function Dashboard() {
   const [open, setOpen] = useState(true);
-  const [userData, setUserData] = useState(null);
-  const [dashboardData, setDashboardData] = useState({ total_newsletters: 0, total_subscriptions: 0 });
+  const [dashboardData, setDashboardData] = useState({
+    total_newsletters: 0,
+    total_subscriptions: 0,
+    all_users: [],
+    all_subscriptions: []
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -120,39 +126,11 @@ export default function Dashboard() {
     try {
       const token = localStorage.getItem('authToken');
       const response = await axios.get('http://127.0.0.1:8000/api/dashboard/', {
-        headers: {
-          Authorization: `Token ${token}` // Send token using Token instead of Bearer
-        }
+        headers: { Authorization: `Token ${token}` }
       });
       setDashboardData(response.data);
     } catch (error) {
-      console.error('Error fetching dashboard data:', error.detail);
-    }
-  };
-
-  useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      navigate('/login');  // Redirect if no token found
-    } else {
-      fetchUserData();
-    }
-  }, []);
-
-  const fetchUserData = async () => {
-    try {
-      const response = await axios.get('http://127.0.0.1/api/user/profile', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`
-        }
-      });
-      setUserData(response.data);
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-      if (error.response?.status === 401) {
-        localStorage.removeItem('authToken');  // Clear invalid token
-        navigate('/login');  // Redirect to login
-      }
+      console.error('Error fetching dashboard data:', error);
     }
   };
 
@@ -259,40 +237,66 @@ export default function Dashboard() {
       <Main open={open}>
         <DrawerHeader />
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Grid container spacing={3}>
+          {/* Tables - Users & Subscriptions */}
           <Grid container spacing={3}>
-            <Grid item xs={12}>
+            {/* Users Table */}
+            <Grid item xs={12} md={12}>
               <StyledPaper>
-                {/* Updated Heading with Color Styling */}
-                <Typography variant="h4" gutterBottom>
-                  <span style={{ color: colorPalette.text }}>NEWS</span>
-                  <span style={{ color: colorPalette.primary }}>CREW</span>
-                </Typography>
-                <Typography variant="body1">
-                  This is your NewsCrew dashboard. You can manage your articles, view statistics, and more.
-                </Typography>
+                <Typography variant="h6" gutterBottom>All Users</Typography>
+                <TableContainer component={Paper}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell><b>Username</b></TableCell>
+                        <TableCell><b>Email</b></TableCell>
+                        <TableCell><b>Date Joined</b></TableCell>
+                        <TableCell><b>Last Login</b></TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {dashboardData.all_users.map((user, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{user.username}</TableCell>
+                          <TableCell>{user.email || "N/A"}</TableCell>
+                          <TableCell>{new Date(user.date_joined).toLocaleDateString()}</TableCell>
+                          <TableCell>{new Date(user.date_joined).toLocaleDateString() || "N/A"}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               </StyledPaper>
             </Grid>
 
-            <Grid item xs={12} md={4}>
+            {/* Subscriptions Table */}
+            <Grid item xs={12} md={12}>
               <StyledPaper>
-                <Typography variant="h6">Total Articles</Typography>
-                <Typography variant="h3">{dashboardData.total_newsletters}</Typography>
-              </StyledPaper>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <StyledPaper>
-                <Typography variant="h6">Total Subscriptions</Typography>
-                <Typography variant="h3">{dashboardData.total_subscriptions}</Typography>
-              </StyledPaper>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <StyledPaper>
-                <Typography variant="h6">Draft Articles</Typography>
-                <Typography variant="h3">{userData?.draftArticles || 0}</Typography>
+                <Typography variant="h6" gutterBottom>All Subscriptions</Typography>
+                <TableContainer component={Paper}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell><b>Email</b></TableCell>
+                        <TableCell><b>Topic</b></TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {dashboardData.all_subscriptions.map((subscription, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{subscription.email}</TableCell>
+                          <TableCell>{subscription.topic}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               </StyledPaper>
             </Grid>
           </Grid>
-        </Container>
+
+        </Grid>
+      </Container>
       </Main>
     </Box>
   );
