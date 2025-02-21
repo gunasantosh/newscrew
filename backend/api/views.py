@@ -10,6 +10,8 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.conf import settings
 from django.db.models import OuterRef, Subquery, Max
+
+from .models import Newsletter
 import os
 import datetime
 import markdown
@@ -111,20 +113,37 @@ class FetchNewslettersAPIView(APIView):
                 file_modified_time = os.path.getmtime(file_path)
                 formatted_date = datetime.datetime.fromtimestamp(file_modified_time)
 
-                # Try to create a new entry (will fail if duplicate due to unique constraint)
-                serializer = NewsletterSerializer(data={
-                    "filename": filename,
-                    "content": content,
-                    "created_at": formatted_date
-                })
+                # Check if newsletter already exists before saving
+                newsletter_exists = Newsletter.objects.filter(filename=filename, created_at=formatted_date).exists()
 
-                if serializer.is_valid():
-                    serializer.save()  # Create a new record
-                    newsletters.append(serializer.data)
-                else:
-                    return Response(serializer.errors, status=400)
+                if not newsletter_exists:
+                    serializer = NewsletterSerializer(data={
+                        "filename": filename,
+                        "content": content,
+                        "created_at": formatted_date
+                    })
+
+                    if serializer.is_valid():
+                        serializer.save()  # Create a new record
+                        newsletters.append(serializer.data)
+                    else:
+                        return Response(serializer.errors, status=400)
 
         return Response({"newsletters": newsletters}, status=200)
+class FetchTopicsAPIView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Fetch unique topics from the Newsletter model
+        topics = Newsletter.objects.values_list("filename", flat=True).distinct()
+
+        if not topics:
+            return Response({"error": "No topics found"}, status=404)
+
+        return Response({"topics": list(topics)}, status=200)
+
+
 
 class GetTopicNewslettersAPIView(APIView):
     authentication_classes = [TokenAuthentication]
@@ -140,21 +159,41 @@ class GetTopicNewslettersAPIView(APIView):
         return Response({"newsletters": serializer.data}, status=200)
 
 
-class LatestNewslettersAPIView(APIView):
+class LatestNewsletterAPIView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        # Subquery to fetch the latest `created_at` for each topic
-        latest_dates = (
-            Newsletter.objects.filter(filename=OuterRef('filename'))
-            .order_by('-created_at')  # Sort in descending order (latest first)
-            .values('created_at')[:1]  # Pick the first (latest) entry
+    def post(self, request):
+        try:
+            latest_newsletter = Newsletter.objects.latest('created_at')
+        except Newsletter.DoesNotExist:
+            return Response({"error": "No newsletters found"}, status=404)
+
+        recipient_list = list(Subscription.objects.values_list('email', flat=True))
+
+        if not recipient_list:
+            return Response({"error": "No subscribed users found"}, status=400)
+
+        # Convert Markdown to HTML
+        html_content = markdown.markdown(latest_newsletter.content)
+        text_content = strip_tags(html_content).strip()  # Strip unnecessary quotes & spaces
+
+        subject = f"Latest Newsletter: {latest_newsletter.filename.replace('.md', '')}"
+
+        send_mail(
+            subject,
+            text_content,  # Plain text version without unnecessary quotes
+            settings.EMAIL_HOST_USER,
+            recipient_list,
+            html_message=html_content,  # HTML version
         )
 
-        # Query the latest newsletters per topic
-        latest_newsletters = Newsletter.objects.filter(created_at=Subquery(latest_dates))
+        return Response({
+            "message": "Latest newsletter sent successfully!",
+            "sent_to": recipient_list
+        }, status=200)
 
-        serializer = NewsletterSerializer(latest_newsletters, many=True)
-        return Response({"latest_newsletters": serializer.data}, status=200)
+
 
     
 class RenderNewsletterAPIView(APIView):
@@ -174,32 +213,55 @@ class SendNewsletterAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        filename = request.data.get('filename')  # Filename of the newsletter to send
-        recipient_list = request.data.get('emails')  # List of recipient emails
+        filename = request.data.get('filename')
 
-        if not filename or not recipient_list:
-            return Response({"error": "Filename and recipient emails are required"}, status=400)
+        if not filename:
+            return Response({"error": "Filename is required"}, status=400)
+
+        # ✅ Fetch recipients correctly from Subscription model
+        recipient_list = list(Subscription.objects.values_list('email', flat=True))
+
+        if not recipient_list:
+            return Response({"error": "No recipients found"}, status=400)
 
         try:
-            newsletter = Newsletter.objects.get(filename=filename)
+            # ✅ Fetch the latest newsletter with the given filename
+            newsletter = Newsletter.objects.filter(filename=filename).latest('created_at')
         except Newsletter.DoesNotExist:
             return Response({"error": "Newsletter not found"}, status=404)
 
-        # Convert markdown to HTML
+        # ✅ Convert markdown content to HTML
         html_content = markdown.markdown(newsletter.content)
         text_content = strip_tags(html_content)  # Plain text version
 
         subject = f"Newsletter: {newsletter.filename.replace('.md', '')}"
 
+        # ✅ Send email
         send_mail(
             subject,
             text_content,
             settings.EMAIL_HOST_USER,
             recipient_list,
-            html_message=html_content,  # Send HTML email
+            html_message=html_content,
         )
 
-        return Response({"message": "Newsletter sent successfully!"}, status=200)
+        return Response({"message": "Newsletter sent successfully!", "sent_to": recipient_list}, status=200)
+class LatestNewslettersAPIView(APIView):
+
+    def get(self, request):
+        # Subquery to fetch the latest `created_at` for each topic
+        latest_dates = (
+            Newsletter.objects.filter(filename=OuterRef('filename'))
+            .order_by('-created_at')  # Sort in descending order (latest first)
+            .values('created_at')[:1]  # Pick the first (latest) entry
+        )
+
+        # Query the latest newsletters per topic
+        latest_newsletters = Newsletter.objects.filter(created_at=Subquery(latest_dates))
+
+        serializer = NewsletterSerializer(latest_newsletters, many=True)
+        return Response({"latest_newsletters": serializer.data}, status=200)
+
 
 class SubscriptionAPIView(APIView):
     def post(self, request):

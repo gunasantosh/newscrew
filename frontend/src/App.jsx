@@ -7,6 +7,7 @@ import SignupSide from './pages/SignupSide';
 import Users from './pages/Users';
 import Articles from './pages/Articles';
 import Settings from './pages/Settings';
+import UserDashboard from './pages/UserDashboard';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/users" element={<Users />} />
         <Route path="/articles" element={<Articles />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/UserDashboard" element={<UserDashboard/>}/>
 
       </Routes>
     </Router>
