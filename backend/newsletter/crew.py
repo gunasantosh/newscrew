@@ -17,7 +17,7 @@ agents = NewsletterAgents()
 tasks = NewsletterTasks()
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-llm = ChatOpenAI(temperature=0, model="gpt-4o-mini", api_key=OPENAI_API_KEY)  # gpt-4 preferred
+llm = ChatOpenAI(temperature=0, model="gpt-4o", api_key=OPENAI_API_KEY)  # gpt-4 or 4o preferred
 
 # Define agents
 editor = agents.editor_agent()
