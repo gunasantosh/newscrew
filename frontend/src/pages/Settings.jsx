@@ -3,15 +3,23 @@ import { styled } from "@mui/material/styles";
 import {
   Box,
   Drawer,
+  AppBar,List,
   Typography,
   IconButton,
   Button,
   TextField,
+  Toolbar,
   Paper,
   MenuItem,
   Select,
   FormControl,
   InputLabel,
+  Container,
+  Divider,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import {
   ChevronLeft as ChevronLeftIcon,
@@ -19,15 +27,90 @@ import {
   Save as SaveIcon,
   Send as SendIcon,
   Update as LatestNewsIcon,
+  Dashboard as DashboardIcon,
+  People as PeopleIcon,
+  Article as ArticleIcon,
+  Settings as SettingsIcon,
+  Logout as LogoutIcon,
+  Menu as MenuIcon,
 } from "@mui/icons-material";
 import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 
 const drawerWidth = 240;
 
+const colorPalette = {
+  primary: "#FF4D4D", // Primary accent color
+  text: "#fff", // White text
+  inputBackground: "#fff", // White background for input fields
+  gradient: {
+    start: "rgba(0,0,0,0.3)", // Gradient start (30% opacity black)
+    end: "rgba(0,0,0,0.8)", // Gradient end (80% opacity black)
+  },
+  button: {
+    background: "#FF4D4D", // Button background
+    hoverScale: 1.1, // Button hover animation scale
+    borderRadius: "30px", // Button border radius
+  },
+  borderRadius: {
+    input: 1, // Input field border radius
+  },
+};
+
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
+  ({ theme, open }) => ({
+    flexGrow: 1,
+    padding: theme.spacing(3),
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    marginLeft: `-${drawerWidth}px`,
+    ...(open && {
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginLeft: 0,
+    }),
+  }),
+);
+
+const StyledAppBar = styled(AppBar, { shouldForwardProp: (prop) => prop !== 'open' })(
+  ({ theme, open }) => ({
+    transition: theme.transitions.create(['margin', 'width'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    ...(open && {
+      width: `calc(100% - ${drawerWidth}px)`,
+      marginLeft: `${drawerWidth}px`,
+      transition: theme.transitions.create(['margin', 'width'], {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    }),
+    backgroundColor: colorPalette.primary, // Apply primary color to AppBar
+  }),
+);
+
+const DrawerHeader = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  padding: theme.spacing(0, 1),
+  ...theme.mixins.toolbar,
+  justifyContent: 'space-between',
+  backgroundColor: colorPalette.primary, // Apply primary color to DrawerHeader
+  color: colorPalette.text, // Apply white text color
+}));
+
 const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
-  marginBottom: theme.spacing(2),
-  backgroundColor: "#f4f4f4",
+  padding: theme.spacing(2),
+  display: 'flex',
+  flexDirection: 'column',
+  height: 240,
+  backgroundColor: colorPalette.gradient.end, // Apply gradient end color to Paper
+  color: colorPalette.text, // Apply white text color
 }));
 
 // Axios instance with interceptor for Authorization
@@ -47,11 +130,41 @@ api.interceptors.request.use(
 );
 
 export default function Settings() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(true);
   const [topic, setTopic] = useState("");
   const [topics, setTopics] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState("");
   const [loading, setLoading] = useState(false); // ✅ Added missing loading state
+
+  const handleDrawerOpen = () => {
+    setOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await axios.post('http://127.0.0.1/api/user/logout', {}, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+    localStorage.removeItem('authToken');
+    navigate('/login');
+  };
+
+  const menuItems = [
+    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
+    { text: 'Users', icon: <PeopleIcon />, path: '/users' },
+    { text: 'Articles', icon: <ArticleIcon />, path: '/articles' },
+    { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+  ];
 
   // ✅ Fetch topics when component mounts
   useEffect(() => {
@@ -136,35 +249,82 @@ export default function Settings() {
     }
   };
 
-  return (
-    <Box sx={{ display: "flex" }}>
-      {/* Sidebar Drawer */}
+  return ( 
+    <Box sx={{ display: 'flex' }}>
+      <StyledAppBar position="fixed" open={open}>
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            onClick={handleDrawerOpen}
+            edge="start"
+            sx={{ mr: 2, ...(open && { display: 'none' }) }}
+          >
+            <MenuIcon />
+          </IconButton>
+          {/* Updated Heading with Color Styling */}
+          <Typography variant="h6" noWrap component="div">
+            <span style={{ color: colorPalette.text }}>NEWS</span>
+            <span style={{ color: colorPalette.text }}>CREW</span>
+          </Typography>
+        </Toolbar>
+      </StyledAppBar>
+
       <Drawer
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          "& .MuiDrawer-paper": {
+          '& .MuiDrawer-paper': {
             width: drawerWidth,
-            backgroundColor: "#222",
-            color: "#fff",
+            boxSizing: 'border-box',
+            backgroundColor: colorPalette.gradient.end, // Apply gradient end color to Drawer
+            color: colorPalette.text, // Apply white text color
           },
         }}
         variant="persistent"
         anchor="left"
         open={open}
       >
-        <Typography variant="h6" sx={{ padding: 2 }}>
-          NEWS CREW
-        </Typography>
-        <IconButton onClick={() => setOpen(false)} sx={{ color: "#fff" }}>
-          <ChevronLeftIcon />
-        </IconButton>
+        <DrawerHeader>
+          {/* Updated Heading with Color Styling */}
+          <Typography variant="h5">
+            <span style={{ color: colorPalette.text }}>NEWS</span>
+            <span style={{ color: colorPalette.text }}>CREW</span>
+          </Typography>
+          <IconButton onClick={handleDrawerClose} sx={{ color: colorPalette.text }}>
+            <ChevronLeftIcon />
+          </IconButton>
+        </DrawerHeader>
+        <Divider />
+        <List>
+          {menuItems.map((item) => (
+            <ListItem key={item.text} disablePadding>
+              <ListItemButton 
+                onClick={() => { navigate(item.path); setOpen(false); }}
+                sx={{ color: colorPalette.text }} // Apply white text color
+              >
+                <ListItemIcon sx={{ color: colorPalette.text }}>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+        <Divider />
+        <List>
+          <ListItem disablePadding>
+            <ListItemButton onClick={handleLogout} sx={{ color: colorPalette.text }}>
+              <ListItemIcon sx={{ color: colorPalette.text }}><LogoutIcon /></ListItemIcon>
+              <ListItemText primary="Logout" />
+            </ListItemButton>
+          </ListItem>
+        </List>
       </Drawer>
 
-      {/* Main Content */}
-      <Box sx={{ flexGrow: 1, padding: 3 }}>
+      <Main open={open}>
+        <DrawerHeader />
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Box sx={{ flexGrow: 1, padding: 3 }}>
         {/* Demo Section */}
-        <StyledPaper>
           <Typography variant="h6">Demo</Typography>
           <TextField
             fullWidth
@@ -183,10 +343,8 @@ export default function Settings() {
           <Button variant="contained" color="info" startIcon={<SendIcon />} onClick={handleSendLatestNewsletter}>
             Send Latest Newsletter
           </Button>
-        </StyledPaper>
 
         {/* Production Section */}
-        <StyledPaper>
           <Typography variant="h6">Production</Typography>
           <FormControl fullWidth sx={{ marginBottom: 2 }}>
             <InputLabel>Select Topic</InputLabel>
@@ -205,8 +363,9 @@ export default function Settings() {
           <Button variant="contained" color="primary" startIcon={<LatestNewsIcon />} onClick={handleUpdateNews}>
             Update News
           </Button>
-        </StyledPaper>
       </Box>
+        </Container>
+      </Main>
     </Box>
   );
 }
