@@ -67,6 +67,7 @@ class LoginAPIView(APIView):
 
         return Response({'token': token.key, 'user': UserSerializer(user).data}, status=200)
 
+# Generate Newsletters
 class NewsAPIView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -91,8 +92,7 @@ class NewsAPIView(APIView):
             print(f"Error: {str(e)}")
             raise ValidationError(f"Error in processing: {str(e)}")
 
-
-
+# Upload Newsletters from output folder to Database
 class FetchNewslettersAPIView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -130,6 +130,8 @@ class FetchNewslettersAPIView(APIView):
                         return Response(serializer.errors, status=400)
 
         return Response({"newsletters": newsletters}, status=200)
+
+# Fetch Topics from Database
 class FetchTopicsAPIView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -143,8 +145,7 @@ class FetchTopicsAPIView(APIView):
 
         return Response({"topics": list(topics)}, status=200)
 
-
-
+# Fetch Newsletters by Topic
 class GetTopicNewslettersAPIView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -157,6 +158,36 @@ class GetTopicNewslettersAPIView(APIView):
 
         serializer = NewsletterSerializer(newsletters, many=True)
         return Response({"newsletters": serializer.data}, status=200)
+
+# Fetch Newsletters by User
+class UserNewslettersAPIView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Get the authenticated user's email
+        user_email = request.user.email
+
+        # Fetch the single topic the user is subscribed to (assuming one topic per user)
+        try:
+            subscribed_topic = Subscription.objects.get(email=user_email).topic
+        except Subscription.DoesNotExist:
+            return Response({"message": "No subscribed topic found."}, status=404)
+
+        # Convert topic name to filename format
+        topic_filename = f"{subscribed_topic.replace(' ', '_')}.md"
+
+        # Fetch newsletters related to the user's subscribed topic
+        newsletters = Newsletter.objects.filter(filename=topic_filename).order_by('-created_at')
+
+        if not newsletters.exists():
+            return Response({"message": "No newsletters found for this topic."}, status=404)
+
+        # Serialize the newsletters
+        serializer = NewsletterSerializer(newsletters, many=True)
+
+        return Response({"Usernewsletters": serializer.data}, status=200)
+
 
 
 class LatestNewsletterAPIView(APIView):
@@ -178,7 +209,7 @@ class LatestNewsletterAPIView(APIView):
         html_content = markdown.markdown(latest_newsletter.content)
         text_content = strip_tags(html_content).strip()  # Strip unnecessary quotes & spaces
 
-        subject = f"Latest Newsletter: {latest_newsletter.filename.replace('.md', '')}"
+        subject = f"NewsCrew Weekly Newsletter"
 
         send_mail(
             subject,
@@ -194,8 +225,6 @@ class LatestNewsletterAPIView(APIView):
         }, status=200)
 
 
-
-    
 class RenderNewsletterAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -246,6 +275,7 @@ class SendNewsletterAPIView(APIView):
         )
 
         return Response({"message": "Newsletter sent successfully!", "sent_to": recipient_list}, status=200)
+    
 class LatestNewslettersAPIView(APIView):
 
     def get(self, request):
@@ -298,3 +328,39 @@ class DashboardAPIView(APIView):
             "all_subscriptions": all_subs_table,
             "articles": articles
         }, status=200)
+    
+
+# update use settings i.e topic
+class UserSettingAPIView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """Fetch the user's current topic"""
+        user_email = request.user.email
+
+        try:
+            user_subscription = Subscription.objects.get(email=user_email)
+            topic_filename = f"{user_subscription.topic.replace(' ', '_')}.md"
+            total_topic_newsletters = Newsletter.objects.filter(filename=topic_filename).count()
+            return Response({"topic": user_subscription.topic, 'total_articles': total_topic_newsletters}, status=200)
+        except Subscription.DoesNotExist:
+            return Response({"message": "No subscribed topic found."}, status=404)
+
+    def post(self, request):
+        """Update the user's topic"""
+        user_email = request.user.email
+        new_topic = request.data.get("topic")
+
+        if not new_topic:
+            return Response({"error": "No topic provided"}, status=400)
+
+        # Update or create the subscription entry
+        subscription, created = Subscription.objects.update_or_create(
+            email=user_email,
+            defaults={"topic": new_topic}
+        )
+
+        return Response({"message": "Topic updated successfully"}, status=200)
+
+

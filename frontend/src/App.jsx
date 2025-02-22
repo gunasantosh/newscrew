@@ -8,6 +8,8 @@ import Users from './pages/Users';
 import Articles from './pages/Articles';
 import Settings from './pages/Settings';
 import UserDashboard from './pages/UserDashboard';
+import Uarticles from './pages/Uarticles';
+import UserSettings from './pages/UserSettings';
 
 function App() {
   return (
@@ -20,8 +22,9 @@ function App() {
         <Route path="/users" element={<Users />} />
         <Route path="/articles" element={<Articles />} />
         <Route path="/settings" element={<Settings />} />
-        <Route path="/UserDashboard" element={<UserDashboard/>}/>
-
+        <Route path="/uDashboard" element={<UserDashboard/>}/>
+        <Route path="/uarticles" element={<Uarticles />} />
+        <Route path="/usettings" element={<UserSettings />} />
       </Routes>
     </Router>
   );

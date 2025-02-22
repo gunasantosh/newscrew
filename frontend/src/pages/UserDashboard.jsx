@@ -23,6 +23,7 @@ import {
   Article as ArticleIcon,
   Settings as SettingsIcon,
   Logout as LogoutIcon,
+  Dashboard as DashboardIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -116,12 +117,12 @@ export default function UserDashboard() {
   const fetchDashboardData = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await axios.get('http://127.0.0.1:8000/api/user-dashboard/', {
+      const response = await axios.get('http://127.0.0.1:8000/api/update_user_topic/', {
         headers: {
           Authorization: `Token ${token}`
         }
       });
-      setDashboardData(response.data);
+      setDashboardData({"total_newsletters": response.data.total_articles, "total_subscriptions": "1"});
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     }
@@ -150,8 +151,9 @@ export default function UserDashboard() {
   };
 
   const menuItems = [
-    { text: 'Articles', icon: <ArticleIcon />, path: '/articles' },
-    { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+    { text: 'Dashboard', icon: <DashboardIcon />, path: '/udashboard' },
+    { text: 'Articles', icon: <ArticleIcon />, path: '/uarticles' },
+    { text: 'Settings', icon: <SettingsIcon />, path: '/usettings' },
   ];
 
   return (
@@ -236,7 +238,7 @@ export default function UserDashboard() {
             <Grid item xs={12} md={6}>
               <StyledPaper>
                 <Typography variant="h6">Total Subscriptions</Typography>
-                <Typography variant="h3">{dashboardData.total_subscriptions}</Typography>
+                <Typography variant="h3">{dashboardData.total_subscriptions || 1}</Typography>
               </StyledPaper>
             </Grid>
           </Grid>

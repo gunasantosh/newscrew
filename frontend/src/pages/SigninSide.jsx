@@ -64,7 +64,13 @@ export default function SigninSide() {
     try {
       const response = await api.post("/login/", formData);
       localStorage.setItem("authToken", response.data.token);
-      navigate("/dashboard");
+      if (formData.username === "sriram"){
+        navigate("/dashboard");
+      }
+      else {
+        navigate("/udashboard");
+      }
+      
     } catch (err) {
       console.error("Login Error:", err.response?.data || err.message);
       setError(

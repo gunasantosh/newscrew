@@ -24,7 +24,6 @@ import {
   Menu as MenuIcon,
   ChevronLeft as ChevronLeftIcon,
   Dashboard as DashboardIcon,
-  People as PeopleIcon,
   Article as ArticleIcon,
   Settings as SettingsIcon,
   Logout as LogoutIcon,
@@ -111,15 +110,11 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 
 
 
-export default function Articles() {
+export default function Uarticles() {
   const [open, setOpen] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState(null);
   const [dashboardData, setDashboardData] = useState({
-    total_newsletters: 0,
-    total_subscriptions: 0,
-    all_users: [],
-    all_subscriptions: [],
     articles:[]
   });
   const navigate = useNavigate();
@@ -131,15 +126,22 @@ export default function Articles() {
   const fetchDashboardData = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await axios.get('http://127.0.0.1:8000/api/dashboard/', {
+      console.log(token);
+      const response = await axios.get('http://127.0.0.1:8000/api/fetch-articles/', {
         headers: { Authorization: `Token ${token}` }
       });
-      setDashboardData(response.data);
+  
+      // Ensure the expected structure matches the response
+      if (response.data.Usernewsletters) {
+        setDashboardData({ articles: response.data.Usernewsletters });
+      } else {
+        setDashboardData({ articles: [] }); // Handle empty response case
+      }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     }
   };
-
+  
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -173,10 +175,9 @@ export default function Articles() {
   };
 
   const menuItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-    { text: 'Users', icon: <PeopleIcon />, path: '/users' },
-    { text: 'Articles', icon: <ArticleIcon />, path: '/articles' },
-    { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+    { text: 'Dashboard', icon: <DashboardIcon />, path: '/udashboard' },
+    { text: 'Articles', icon: <ArticleIcon />, path: '/uarticles' },
+    { text: 'Settings', icon: <SettingsIcon />, path: '/usettings' },
   ];
 
   return (

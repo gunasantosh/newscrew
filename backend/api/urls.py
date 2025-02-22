@@ -2,7 +2,8 @@ from django.urls import path
 from api.views import (
     NewsAPIView, RegisterAPIView, LoginAPIView, FetchTopicsAPIView, 
     FetchNewslettersAPIView, LatestNewsletterAPIView, GetTopicNewslettersAPIView,
-    RenderNewsletterAPIView, SendNewsletterAPIView, SubscriptionAPIView, DashboardAPIView,LatestNewslettersAPIView
+    RenderNewsletterAPIView, SendNewsletterAPIView, SubscriptionAPIView, DashboardAPIView,LatestNewslettersAPIView,
+    UserNewslettersAPIView, UserSettingAPIView
 )
 
 urlpatterns = [
@@ -17,5 +18,7 @@ urlpatterns = [
     path('latest-newsletters/', LatestNewslettersAPIView.as_view(), name='latest-newsletters'),
     path("subscribe/", SubscriptionAPIView.as_view(), name="subscribe"),
     path("dashboard/", DashboardAPIView.as_view(), name="dashboard"),
-    path("fetch-topics/", FetchTopicsAPIView.as_view(), name="fetch-topics"),  # ✅ Removed "api/"
+    path("fetch-topics/", FetchTopicsAPIView.as_view(), name="fetch-topics"),
+    path("fetch-articles/", UserNewslettersAPIView.as_view(), name="fetch-articles"),
+    path('update_user_topic/', UserSettingAPIView.as_view(), name='update_user_topic'),
 ]
