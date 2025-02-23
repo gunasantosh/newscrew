@@ -1,6 +1,21 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Newsletter, Subscription
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        try:
+            user = User.objects.get(email=value)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("User with this email does not exist.")
+
+        return value
+
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, min_length=6)

@@ -43,7 +43,12 @@ export default function SigninSide() {
     try {
       const response = await api.post("/login/", formData);
       localStorage.setItem("authToken", response.data.token);
-      navigate("/dashboard");
+      if (response.data.user.email === "gunasantosh999@gmail.com"){
+        navigate("/dashboard");
+      } 
+      else{
+        navigate("/uDashboard");
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Login failed. Please check your credentials.");
     } finally {
@@ -55,7 +60,7 @@ export default function SigninSide() {
     setResetMessage("");
     setResetLoading(true);
     try {
-      await api.post("/password-reset/", { email: resetEmail });
+      await api.post("http://127.0.0.1:8000/api/password-reset/", { email: resetEmail });
       setResetMessage("✅ Password reset link sent to your email.");
     } catch (err) {
       setResetMessage("❌ Failed to send reset link. Please check your email.");

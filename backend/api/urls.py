@@ -3,7 +3,8 @@ from api.views import (
     NewsAPIView, RegisterAPIView, LoginAPIView, FetchTopicsAPIView, 
     FetchNewslettersAPIView, LatestNewsletterAPIView, GetTopicNewslettersAPIView,
     RenderNewsletterAPIView, SendNewsletterAPIView, SubscriptionAPIView, DashboardAPIView,LatestNewslettersAPIView,
-    UserNewslettersAPIView, UserSettingAPIView
+    UserNewslettersAPIView, UserSettingAPIView, PasswordResetRequestView, PasswordResetConfirmView,
+    UserProfileView
 )
 
 urlpatterns = [
@@ -21,4 +22,9 @@ urlpatterns = [
     path("fetch-topics/", FetchTopicsAPIView.as_view(), name="fetch-topics"),
     path("fetch-articles/", UserNewslettersAPIView.as_view(), name="fetch-articles"),
     path('update_user_topic/', UserSettingAPIView.as_view(), name='update_user_topic'),
+
+    path('password-reset/', PasswordResetRequestView.as_view(), name='password-reset-request'),
+    path('password-reset-confirm/<uidb64>/<token>/', PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
+
+    path('user/profile/', UserProfileView.as_view(), name='user-profile'),
 ]

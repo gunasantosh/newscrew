@@ -112,10 +112,6 @@ export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState({ total_newsletters: 0, total_subscriptions: 0 });
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
   const fetchDashboardData = async () => {
     try {
       const token = localStorage.getItem('authToken');
@@ -133,28 +129,43 @@ export default function Dashboard() {
   useEffect(() => {
     const token = localStorage.getItem('authToken');
     if (!token) {
-      navigate('/login');  // Redirect if no token found
+      navigate('/login'); // Redirect if no token found
     } else {
       fetchUserData();
+      fetchDashboardData();
     }
   }, []);
-
+  
   const fetchUserData = async () => {
     try {
-      const response = await axios.get('http://127.0.0.1/api/user/profile', {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+  
+      const response = await axios.get('http://127.0.0.1:8000/api/user/profile/', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`
+          Authorization: `Token ${token}` // Corrected Token format
         }
       });
+  
       setUserData(response.data);
+  
+      // Check if the user is an admin
+      if (response.data.email !== "gunasantosh999@gmail.com") {
+        navigate('/uDashboard'); // Redirect unauthorized users
+      }
     } catch (error) {
       console.error('Error fetching user data:', error);
       if (error.response?.status === 401) {
-        localStorage.removeItem('authToken');  // Clear invalid token
-        navigate('/login');  // Redirect to login
+        localStorage.removeItem('authToken');
+        navigate('/login'); // Redirect if unauthorized
       }
     }
   };
+  
+  
 
   const handleDrawerOpen = () => {
     setOpen(true);

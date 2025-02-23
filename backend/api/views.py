@@ -21,6 +21,13 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
 
+from django.utils.http import urlsafe_base64_decode
+from rest_framework.permissions import AllowAny
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes, force_str
+from rest_framework import status
+
 OUTPUTS_DIR = os.path.join(settings.BASE_DIR, 'output')
 
 class RegisterAPIView(APIView):
@@ -364,3 +371,69 @@ class UserSettingAPIView(APIView):
         return Response({"message": "Topic updated successfully"}, status=200)
 
 
+
+# Password reset views
+
+class PasswordResetRequestView(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"error": "User with this email does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        reset_link = f"http://localhost:5173/reset-password/{uid}/{token}"  # Change frontend URL accordingly
+
+        send_mail(
+            "Password Reset Request",
+            f"Click the link to reset your password: {reset_link}",
+            "newscrew247@gmail.com",
+            [email],
+            fail_silently=False,
+        )
+
+        return Response({"message": "Password reset link sent to email"}, status=status.HTTP_200_OK)
+
+
+class PasswordResetConfirmView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, uidb64, token):
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+        except (User.DoesNotExist, ValueError, TypeError):
+            return Response({"error": "Invalid token or user does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not default_token_generator.check_token(user, token):
+            return Response({"error": "Invalid or expired token"}, status=status.HTTP_400_BAD_REQUEST)
+
+        new_password = request.data.get("password")
+        if not new_password:
+            return Response({"error": "Password is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        user.save()
+
+        return Response({"message": "Password successfully reset"}, status=status.HTTP_200_OK)
+
+
+# View user Profile
+class UserProfileView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user  # Retrieved from the token
+
+        return Response({
+            "id": user.id,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "username": user.username,
+            "is_staff": user.is_staff,
+            "date_joined": user.date_joined,
+        })

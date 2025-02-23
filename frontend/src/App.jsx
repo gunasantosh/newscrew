@@ -10,6 +10,7 @@ import Settings from './pages/Settings';
 import UserDashboard from './pages/UserDashboard';
 import Uarticles from './pages/Uarticles';
 import UserSettings from './pages/UserSettings';
+import ResetPassword from './pages/ResetPassword';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/uDashboard" element={<UserDashboard/>}/>
         <Route path="/uarticles" element={<Uarticles />} />
         <Route path="/usettings" element={<UserSettings />} />
+        <Route path="/reset-password/:uid/:token" element={<ResetPassword />} />
       </Routes>
     </Router>
   );

@@ -107,8 +107,40 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 
 export default function UserDashboard() {
   const [open, setOpen] = useState(true);
+  const [userData, setUserData] = useState({ email: '' });
   const [dashboardData, setDashboardData] = useState({ total_newsletters: 0, total_subscriptions: 0 });
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      navigate('/login'); // Redirect if no token found
+    } else {
+      fetchUserData();
+    }
+  }, []);
+  
+  const fetchUserData = async () => {
+    try {
+      const response = await axios.get('http://127.0.0.1:8000/api/user/profile', {
+        headers: {
+          Authorization: `Token ${localStorage.getItem('authToken')}`
+        }
+      });
+      setUserData(response.data);
+      console.log(userData);
+      // Check user email for access control
+      if (response.data.email !== "gunasantosh999@gmail.com") {
+        navigate('/uDashboard'); // Redirect unauthorized users
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      if (error.response?.status === 401) {
+        localStorage.removeItem('authToken'); // Clear invalid token
+        navigate('/login'); // Redirect to login
+      }
+    }
+  };
 
   useEffect(() => {
     fetchDashboardData();
