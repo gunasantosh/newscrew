@@ -15,6 +15,7 @@ from .models import Newsletter
 import os
 import datetime
 import markdown
+from django.template.loader import render_to_string
 from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -196,8 +197,7 @@ class UserNewslettersAPIView(APIView):
         return Response({"Usernewsletters": serializer.data}, status=200)
 
 
-
-class LatestNewsletterAPIView(APIView):
+class SendLatestNewsletterAPIView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -213,23 +213,29 @@ class LatestNewsletterAPIView(APIView):
             return Response({"error": "No subscribed users found"}, status=400)
 
         # Convert Markdown to HTML
-        html_content = markdown.markdown(latest_newsletter.content)
-        text_content = strip_tags(html_content).strip()  # Strip unnecessary quotes & spaces
+        newsletter_html = markdown.markdown(latest_newsletter.content)
+        text_content = strip_tags(newsletter_html).strip()  # Extract plain text
 
-        subject = f"NewsCrew Weekly Newsletter"
+        subject = "NewsCrew Weekly Newsletter"
+
+        # Render HTML email template with newsletter content
+        html_content = render_to_string("newsletter_email_template.html", {
+            "newsletter_content": newsletter_html
+        })
 
         send_mail(
             subject,
-            text_content,  # Plain text version without unnecessary quotes
+            text_content,  # Plain text version
             settings.EMAIL_HOST_USER,
             recipient_list,
-            html_message=html_content,  # HTML version
+            html_message=html_content,  # Full HTML email template
         )
 
         return Response({
             "message": "Latest newsletter sent successfully!",
             "sent_to": recipient_list
         }, status=200)
+
 
 
 class RenderNewsletterAPIView(APIView):

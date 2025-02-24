@@ -1,7 +1,7 @@
 from django.urls import path
 from api.views import (
     NewsAPIView, RegisterAPIView, LoginAPIView, FetchTopicsAPIView, 
-    FetchNewslettersAPIView, LatestNewsletterAPIView, GetTopicNewslettersAPIView,
+    FetchNewslettersAPIView, SendLatestNewsletterAPIView, GetTopicNewslettersAPIView,
     RenderNewsletterAPIView, SendNewsletterAPIView, SubscriptionAPIView, DashboardAPIView,LatestNewslettersAPIView,
     UserNewslettersAPIView, UserSettingAPIView, PasswordResetRequestView, PasswordResetConfirmView,
     UserProfileView
@@ -15,7 +15,7 @@ urlpatterns = [
     path("newsletters/<str:topic_name>/", GetTopicNewslettersAPIView.as_view(), name="get-topic-newsletters"),
     path("render-newsletter/<str:filename>/", RenderNewsletterAPIView.as_view(), name="render-newsletter"),
     path("send-newsletter/", SendNewsletterAPIView.as_view(), name="send-newsletter"),
-    path("latest-newsletter/", LatestNewsletterAPIView.as_view(), name="latest-newsletter"),
+    path("latest-newsletter/", SendLatestNewsletterAPIView.as_view(), name="latest-newsletter"), # Seeting send email path
     path('latest-newsletters/', LatestNewslettersAPIView.as_view(), name='latest-newsletters'),
     path("subscribe/", SubscriptionAPIView.as_view(), name="subscribe"),
     path("dashboard/", DashboardAPIView.as_view(), name="dashboard"),

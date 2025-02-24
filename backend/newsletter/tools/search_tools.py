@@ -9,8 +9,9 @@ class SearchTool:
     @tool("Search the internet")
     def search_google(query: str):
         """Searches the internet for relevant AI articles."""
+
         url = "https://google.serper.dev/search"
-        payload = json.dumps({"q": query, "num": 5, "tbm": "nws"})
+        payload = json.dumps({"q": query, "num": 9, "tbm": "nws", "tbs": "qdr:w"})
         headers = {
             "X-API-KEY": os.environ.get("SERPER_API_KEY"),
             "content-type": "application/json",

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .banner {
+            width: 100%;
+            text-align: center;
+            background: #0073e6;
+            color: white;
+            padding: 15px 0;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            padding: 20px;
+        }
+        .footer {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            padding: 15px 0;
+            background: #f1f1f1;
+            border-radius: 0 0 8px 8px;
+        }
+        a {
+            color: #0073e6;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Custom Banner -->
+        <div class="banner">
+            🌟 NewsCrew Weekly Newsletter 🌟
+        </div>
+
+        <!-- Newsletter Content -->
+        <div class="content">
+            {{ newsletter_content|safe }}
+        </div>
+
+        <!-- Custom Footer -->
+        <div class="footer">
+            You are receiving this email because you subscribed to NewsCrew.<br>
+            <a href="{{ unsubscribe_url }}">Unsubscribe</a> | <a href="{{ website_url }}">Visit Website</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -4,7 +4,7 @@ import datetime
 class Newsletter(models.Model):
     filename = models.CharField(max_length=255)  # Topic name
     content = models.TextField()  # Stores large markdown content
-    created_at = models.DateTimeField(default=datetime.datetime.now)  # Auto-generates timestamp
+    created_at = models.DateTimeField()  # Auto-generates timestamp
 
     class Meta:
         unique_together = ('filename', 'created_at')  # Prevents duplicate newsletters
