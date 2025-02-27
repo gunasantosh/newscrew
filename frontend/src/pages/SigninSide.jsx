@@ -169,9 +169,7 @@ export default function SigninSide() {
     sx={{ backgroundColor: "#fff", borderRadius: "10px" }}
   />
 
-  <Link component="button" variant="body2" sx={{ color: "#FF4D4D", mt: 1 }} onClick={() => setOpenResetDialog(true)}>
-    Forgot Password?
-  </Link>
+  
 
   <Button type="submit" fullWidth variant="contained" sx={{ bgcolor: "#FF4D4D", mt: 2, py: 1.5, borderRadius: "30px", fontWeight: "bold" }} disabled={loading}>
     {loading ? "Signing in..." : "Sign In"}
@@ -182,10 +180,15 @@ export default function SigninSide() {
     <Copyright />
   </Box>
 </Box>
+<Link component="button" variant="body2" sx={{ color: "#FF4D4D", mt: 1 }} onClick={() => setOpenResetDialog(true)}>
+    Forgot Password?
+  </Link>
 
 
         {/* Password Reset Dialog */}
-        <Dialog 
+        
+      </Grid>
+      <Dialog 
           open={openResetDialog} 
           onClose={() => setOpenResetDialog(false)}
           PaperProps={{
@@ -218,7 +221,6 @@ export default function SigninSide() {
             </Button>
           </DialogActions>
         </Dialog>
-      </Grid>
     </Grid>
   );
 }

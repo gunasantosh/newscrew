@@ -1,4 +1,6 @@
 from pathlib import Path
+from dotenv import load_dotenv
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -80,14 +82,15 @@ WSGI_APPLICATION = "backend.wsgi.application"
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'root@123',  # Replace with your actual password
-        'HOST': 'db.oqoouaadaustomqhrnoz.supabase.co',
-        'PORT': '5432',
+        'USER': 'postgres.oqoouaadaustomqhrnoz',
+        'PASSWORD': os.getenv('DATABASE_PASSWORD'),  
+        'HOST': 'aws-0-ap-south-1.pooler.supabase.com',
+        'PORT': '6543',  # Using connection pooling (pgbouncer)
     }
 }
+
 
 
 
@@ -152,8 +155,8 @@ REST_FRAMEWORK = {
 }
 
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'newscrew247@gmail.com'
-EMAIL_HOST_PASSWORD = 'fwoanjsqmtliozoc'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

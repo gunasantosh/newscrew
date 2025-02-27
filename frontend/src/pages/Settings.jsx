@@ -211,7 +211,7 @@ export default function Settings() {
       alert(`Newsletter sent to:\n${response.data.sent_to?.join("\n") || "No recipients"}`);
     } catch (error) {
       console.error("Error sending newsletter:", error);
-      alert("Failed to send newsletter.");
+      alert("Failed to send newsletter.");z
     }
   };
 
