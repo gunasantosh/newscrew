@@ -2,6 +2,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 
+load_dotenv()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -85,7 +87,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
         'USER': 'postgres.oqoouaadaustomqhrnoz',
-        'PASSWORD': os.getenv('DATABASE_PASSWORD'),  
+        'PASSWORD': os.environ.get('DATABASE_PASSWORD'),  
         'HOST': 'aws-0-ap-south-1.pooler.supabase.com',
         'PORT': '6543',  # Using connection pooling (pgbouncer)
     }
