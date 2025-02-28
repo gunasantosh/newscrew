@@ -4,7 +4,7 @@ from datetime import datetime
 
 from newsletter.agents import NewsletterAgents
 from newsletter.tasks import NewsletterTasks
-from crewai import Crew, Process
+from crewai import Crew, Process, LLM
 
 from langchain_openai import ChatOpenAI
 from newsletter.tools.save_file import save_file
@@ -17,7 +17,11 @@ agents = NewsletterAgents()
 tasks = NewsletterTasks()
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-llm = ChatOpenAI(temperature=0, model="gpt-4o", api_key=OPENAI_API_KEY)  # gpt-4 or 4o preferred
+DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY") 
+# llm = ChatOpenAI(temperature=0, model="gpt-4o", api_key=OPENAI_API_KEY)  # gpt-4 or 4o preferred
+# llm = ChatDeepSeek(model='deepseek-chat', api_key=DEEPSEEK_API_KEY)
+llm = LLM(model='deepseek/deepseek-chat', api_key=DEEPSEEK_API_KEY)
+
 
 # Define agents
 editor = agents.editor_agent()
