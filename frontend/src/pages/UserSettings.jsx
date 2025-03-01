@@ -3,7 +3,7 @@ import { styled } from '@mui/material/styles';
 import {
   Box, Drawer, AppBar, Toolbar, List, Typography, Divider, IconButton, ListItem,
   ListItemButton, ListItemIcon, ListItemText, Button, Dialog, DialogTitle, 
-  DialogContent, DialogActions, TextField
+  DialogContent, DialogActions, TextField, Chip
 } from '@mui/material';
 import {
   Menu as MenuIcon, ChevronLeft as ChevronLeftIcon,
@@ -165,7 +165,16 @@ export default function Usettings() {
 
       <Main open={open}>
         <DrawerHeader />
-        <Typography variant="h6">Current Topic: {currentTopic || "Not set"}</Typography>
+        <Box display="flex" alignItems="center" gap={1} sx={{ p: 1 }}>
+      <Typography variant="h6" color="text.secondary">
+        Current Topic:
+      </Typography>
+      <Chip 
+        label={currentTopic || "Not set"} 
+        color={currentTopic ? "primary" : "warning"} 
+        sx={{ fontSize: "1rem", fontWeight: "bold", backgroundColor: colorPalette.primary }} 
+      />
+    </Box>
         <Button variant="contained" sx={{ backgroundColor: colorPalette.button.background }} onClick={() => setOpenDialog(true)}>
           Update Topic
         </Button>

@@ -17,7 +17,7 @@ import datetime
 import markdown
 from django.template.loader import render_to_string
 from django.shortcuts import get_object_or_404
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
@@ -218,22 +218,25 @@ class SendLatestNewsletterAPIView(APIView):
 
         subject = "NewsCrew Weekly Newsletter"
 
-        # Render HTML email template with newsletter content
+        # Render HTML email template
         html_content = render_to_string("newsletter_email_template.html", {
             "newsletter_content": newsletter_html
         })
 
-        send_mail(
-            subject,
-            text_content,  # Plain text version
-            settings.EMAIL_HOST_USER,
-            recipient_list,
-            html_message=html_content,  # Full HTML email template
+        # Create an email object
+        email = EmailMultiAlternatives(
+            subject=subject,
+            body=text_content,  # Plain text version
+            from_email=settings.EMAIL_HOST_USER,
+            to=[settings.EMAIL_HOST_USER],  # Set your own email in 'To' to avoid exposure
+            bcc=recipient_list,  # Hides recipients
         )
+        email.attach_alternative(html_content, "text/html")  # Attach HTML version
+        email.send()
 
         return Response({
             "message": "Latest newsletter sent successfully!",
-            "sent_to": recipient_list
+            "sent_count": len(recipient_list)
         }, status=200)
 
 

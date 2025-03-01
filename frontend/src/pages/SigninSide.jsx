@@ -180,6 +180,24 @@ export default function SigninSide() {
     <Copyright />
   </Box>
 </Box>
+<Grid container justifyContent="center" sx={{ mt: 2 }}>
+              <ul style={{ listStyleType: "none", padding: 0, margin: 0 }}>
+                <li>
+                  <Link
+                    component="button"
+                    variant="body2"
+                    sx={{
+                      color: "#FF4D4D",
+                      textDecoration: "none",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => navigate("/")}
+                  >
+                    Go to Home
+                  </Link>
+                </li>
+              </ul>
+            </Grid>
 <Link component="button" variant="body2" sx={{ color: "#FF4D4D", mt: 1 }} onClick={() => setOpenResetDialog(true)}>
     Forgot Password?
   </Link>

@@ -135,7 +135,9 @@ export default function Settings() {
   const [topic, setTopic] = useState("");
   const [topics, setTopics] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState("");
-  const [loading, setLoading] = useState(false); // ✅ Added missing loading state
+  const [loading, setLoading] = useState(false);
+  // Add a message state to show the operation status
+  const [statusMessage, setStatusMessage] = useState("");
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -166,7 +168,7 @@ export default function Settings() {
     { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
   ];
 
-  // ✅ Fetch topics when component mounts
+  // Fetch topics when component mounts
   useEffect(() => {
     const fetchTopics = async () => {
       try {
@@ -181,71 +183,113 @@ export default function Settings() {
     fetchTopics();
   }, []);
 
-  // ✅ Generate News
+  // Generate News
   const handleGenerateNews = async () => {
-    if (!topic.trim()) return alert("Enter a topic first.");
+    if (!topic.trim()) {
+      return alert("Enter a topic first.");
+    }
+    
+    setLoading(true);
+    setStatusMessage("Generating news...");
     try {
       await api.post("news-gen/", { topic });
+      setStatusMessage("News generated successfully!");
       alert("News generated successfully!");
     } catch (error) {
       console.error("Error generating news:", error);
+      setStatusMessage("Failed to generate news.");
       alert("Failed to generate news.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // ✅ Save News to DB
+  // Save News to DB
   const handleSaveToDB = async () => {
+    setLoading(true);
+    setStatusMessage("Saving news to database...");
     try {
       await api.get("fetch-newsletters/");
+      setStatusMessage("News saved to the database successfully!");
       alert("News saved to the database successfully!");
     } catch (error) {
       console.error("Error saving news:", error);
+      setStatusMessage("Failed to save news.");
       alert("Failed to save news.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // ✅ Send Latest Newsletter
-  const handleSendLatestNewsletter = async () => {
-    try {
-      const response = await api.post("latest-newsletter/");
-      alert(`Newsletter sent to:\n${response.data.sent_to?.join("\n") || "No recipients"}`);
-    } catch (error) {
-      console.error("Error sending newsletter:", error);
-      alert("Failed to send newsletter.");z
-    }
-  };
+// Send Latest Newsletter
+const handleSendLatestNewsletter = async () => {
+  setLoading(true);
+  setStatusMessage("Sending latest newsletter...");
+  try {
+    const response = await api.post("latest-newsletter/");
+    const sentCount = response.data.sent_count || 0; // Get the number of emails sent
+    const message = `Newsletter sent successfully to ${sentCount} subscribers.`;
+    
+    setStatusMessage(message);
+    // alert(message);
+  } catch (error) {
+    console.error("Error sending newsletter:", error);
+    setStatusMessage("Failed to send newsletter.");
+    alert("Failed to send newsletter.");
+  } finally {
+    setLoading(false);
+  }
+};
 
-  // ✅ Send Newsletter for Selected Topic
+
+  // Send Newsletter for Selected Topic
   const handleSendNewsletterForTopic = async () => {
-    if (!selectedTopic) return alert("Please select a topic first.");
+    if (!selectedTopic) {
+      return alert("Please select a topic first.");
+    }
+    
     if (!window.confirm(`Send newsletter for '${selectedTopic}'?`)) return;
 
     setLoading(true);
+    setStatusMessage(`Sending newsletter for '${selectedTopic}'...`);
     try {
       const response = await api.post("send-newsletter/", { filename: selectedTopic });
-      alert(`Newsletter sent for '${selectedTopic}' to:\n${response.data.sent_to?.join("\n") || "No recipients"}`);
+      const message = `Newsletter sent for '${selectedTopic}' to:\n${response.data.sent_to?.join("\n") || "No recipients"}`;
+      setStatusMessage(message);
+      alert(message);
     } catch (error) {
       console.error("Error sending newsletter:", error);
+      setStatusMessage("Failed to send newsletter for the selected topic.");
       alert("Failed to send newsletter for the selected topic.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
-  // ✅ Update News (Prevents duplicate `.md` extension)
+  // Update News (Prevents duplicate `.md` extension)
   const handleUpdateNews = async () => {
-    if (!selectedTopic) return alert("Please select a topic first.");
+    if (!selectedTopic) {
+      return alert("Please select a topic first.");
+    }
 
     const formattedTopic = selectedTopic.replace(/\.md$/, ""); // Ensure no duplicate .md
-
+    
+    setLoading(true);
+    setStatusMessage(`Updating news for '${formattedTopic}.md'...`);
     try {
       await api.post("news-gen/", { topic: `${formattedTopic}.md` });
       await api.get("fetch-newsletters/");
       const response = await api.post("latest-newsletter/", { topic: `${formattedTopic}.md` });
-
-      alert(`Updated news sent for ${formattedTopic}.md to:\n${response.data.sent_to?.join("\n") || "No recipients"}`);
+      
+      const message = `Updated news sent for ${formattedTopic}.md to:\n${response.data.sent_to?.join("\n") || "No recipients"}`;
+      setStatusMessage(message);
+      alert(message);
     } catch (error) {
       console.error("Error updating news:", error);
+      setStatusMessage("Failed to update news.");
       alert("Failed to update news.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -323,47 +367,107 @@ export default function Settings() {
       <Main open={open}>
         <DrawerHeader />
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Box sx={{ flexGrow: 1, padding: 3 }}>
-        {/* Demo Section */}
-          <Typography variant="h6">Demo</Typography>
-          <TextField
-            fullWidth
-            label="Enter Topic"
-            variant="outlined"
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            sx={{ marginBottom: 2 }}
-          />
-          <Button variant="contained" color="primary" startIcon={<NewsIcon />} onClick={handleGenerateNews} sx={{ marginRight: 1 }}>
-            Generate News
-          </Button>
-          <Button variant="contained" color="secondary" startIcon={<SaveIcon />} onClick={handleSaveToDB} sx={{ marginRight: 1 }}>
-            Save to DB
-          </Button>
-          <Button variant="contained" color="info" startIcon={<SendIcon />} onClick={handleSendLatestNewsletter}>
-            Send Latest Newsletter
-          </Button>
+          <Box sx={{ flexGrow: 1, padding: 3 }}>
+            {/* Status message display */}
+            {statusMessage && (
+              <Typography 
+                variant="body1" 
+                sx={{ 
+                  mb: 2, 
+                  p: 1, 
+                  bgcolor: 'info.light', 
+                  borderRadius: 1 
+                }}
+              >
+                {statusMessage}
+              </Typography>
+            )}
 
-        {/* Production Section */}
-          <Typography variant="h6">Production</Typography>
-          <FormControl fullWidth sx={{ marginBottom: 2 }}>
-            <InputLabel>Select Topic</InputLabel>
-            <Select value={selectedTopic} onChange={(e) => setSelectedTopic(e.target.value)}>
-              {topics.map((topic, index) => (
-                <MenuItem key={index} value={topic}>{topic}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <Button variant="contained" color="secondary" startIcon={<SaveIcon />} onClick={handleSaveToDB} sx={{ marginRight: 1 }}>
-            Save to DB
-          </Button>
-          <Button variant="contained" color="success" startIcon={<SendIcon />} onClick={handleSendNewsletterForTopic} sx={{ marginRight: 1 }} disabled={loading}>
-            {loading ? "Sending..." : "Send Newsletter"}
-          </Button>
-          <Button variant="contained" color="primary" startIcon={<LatestNewsIcon />} onClick={handleUpdateNews}>
-            Update News
-          </Button>
-      </Box>
+            {/* Demo Section */}
+            <Typography variant="h6">Demo</Typography>
+            <TextField
+              fullWidth
+              label="Enter Topic"
+              variant="outlined"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              sx={{ marginBottom: 2 }}
+              disabled={loading}
+            />
+            <Button 
+              variant="contained" 
+              color="primary" 
+              startIcon={<NewsIcon />} 
+              onClick={handleGenerateNews} 
+              sx={{ marginRight: 1 }}
+              disabled={loading}
+            >
+              {loading ? "Generating..." : "Generate News"}
+            </Button>
+            <Button 
+              variant="contained" 
+              color="secondary" 
+              startIcon={<SaveIcon />} 
+              onClick={handleSaveToDB} 
+              sx={{ marginRight: 1 }}
+              disabled={loading}
+            >
+              {loading ? "Saving..." : "Save to DB"}
+            </Button>
+            <Button 
+              variant="contained" 
+              color="info" 
+              startIcon={<SendIcon />} 
+              onClick={handleSendLatestNewsletter}
+              disabled={loading}
+            >
+              {loading ? "Sending..." : "Send Latest Newsletter"}
+            </Button>
+
+            {/* Production Section */}
+            <Typography variant="h6" sx={{ mt: 4 }}>Production</Typography>
+            <FormControl fullWidth sx={{ marginBottom: 2 }}>
+              <InputLabel>Select Topic</InputLabel>
+              <Select 
+                value={selectedTopic} 
+                onChange={(e) => setSelectedTopic(e.target.value)}
+                disabled={loading}
+              >
+                {topics.map((topic, index) => (
+                  <MenuItem key={index} value={topic}>{topic}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <Button 
+              variant="contained" 
+              color="secondary" 
+              startIcon={<SaveIcon />} 
+              onClick={handleSaveToDB} 
+              sx={{ marginRight: 1 }}
+              disabled={loading}
+            >
+              {loading ? "Saving..." : "Save to DB"}
+            </Button>
+            <Button 
+              variant="contained" 
+              color="success" 
+              startIcon={<SendIcon />} 
+              onClick={handleSendNewsletterForTopic} 
+              sx={{ marginRight: 1 }} 
+              disabled={loading}
+            >
+              {loading ? "Sending..." : "Send Newsletter"}
+            </Button>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              startIcon={<LatestNewsIcon />} 
+              onClick={handleUpdateNews}
+              disabled={loading}
+            >
+              {loading ? "Updating..." : "Update News"}
+            </Button>
+          </Box>
         </Container>
       </Main>
     </Box>
