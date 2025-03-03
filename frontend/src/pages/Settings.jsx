@@ -199,7 +199,7 @@ export default function Settings() {
     setLoading(true);
     setStatusMessage("Saving news to database...");
     try {
-      await api.get("fetch-newsletters/");
+      await api.get("upload-newsletters/");
       setStatusMessage("News saved to the database successfully!");
     } catch (error) {
       console.error("Error saving news:", error);
@@ -215,7 +215,7 @@ const handleSendLatestNewsletter = async () => {
   setLoading(true);
   setStatusMessage("Sending latest newsletter...");
   try {
-    const response = await api.post("latest-newsletter/");
+    const response = await api.post("send-latest-newsletter/");
     const sentCount = response.data.sent_count || 0; // Get the number of emails sent
     const message = `Newsletter sent successfully to ${sentCount} subscribers.`;
     
