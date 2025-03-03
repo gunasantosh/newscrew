@@ -3,7 +3,7 @@ import { styled } from '@mui/material/styles';
 import {
   Box, Drawer, AppBar, Toolbar, List, Typography, Divider, IconButton, ListItem,
   ListItemButton, ListItemIcon, ListItemText, Button, Dialog, DialogTitle, 
-  DialogContent, DialogActions, TextField, Chip
+  DialogContent, DialogActions, TextField, Chip, Snackbar, Alert
 } from '@mui/material';
 import {
   Menu as MenuIcon, ChevronLeft as ChevronLeftIcon,
@@ -76,7 +76,7 @@ export default function Usettings() {
   const [openDialog, setOpenDialog] = useState(false);
   const [currentTopic, setCurrentTopic] = useState("");
   const [newTopic, setNewTopic] = useState("");
-  const [updateMessage, setUpdateMessage] = useState("");
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -105,11 +105,11 @@ export default function Usettings() {
       );
       if (response.status === 200) {
         setCurrentTopic(newTopic);
-        setUpdateMessage("Topic updated successfully!");
+        setSnackbar({ open: true, message: "Topic updated successfully!", severity: "success" });
       }
     } catch (error) {
       console.error("Error updating topic:", error);
-      setUpdateMessage("Failed to update topic.");
+      setSnackbar({ open: true, message: "Error updating topic!", severity: "error" });
     }
     setOpenDialog(false);
   };
@@ -178,7 +178,6 @@ export default function Usettings() {
         <Button variant="contained" sx={{ backgroundColor: colorPalette.button.background }} onClick={() => setOpenDialog(true)}>
           Update Topic
         </Button>
-        {updateMessage && <Typography>{updateMessage}</Typography>}
 
         <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
           <DialogTitle>Update Topic</DialogTitle>
@@ -190,6 +189,34 @@ export default function Usettings() {
             <Button sx={{ backgroundColor: colorPalette.button.background }} onClick={handleUpdateTopic} variant="contained">Update</Button>
           </DialogActions>
         </Dialog>
+          {/* Snackbar for Feedback */}
+          <Snackbar
+              open={snackbar.open}
+              autoHideDuration={3000}
+              onClose={() => setSnackbar({ ...snackbar, open: false })}
+              anchorOrigin={{ vertical: 'top', horizontal: 'right' }} // Position it at the top right
+              sx={{
+                '& .MuiSnackbarContent-root': {
+                  backgroundColor: snackbar.severity === 'success' ? '#4CAF50' : '#333', // Green for success, dark gray for others
+                  color: '#fff', // White text for contrast
+                  fontWeight: 'bold',
+                  borderRadius: '8px',
+                  boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
+                },
+              }}
+            >
+              <Alert
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+                severity={snackbar.severity}
+                sx={{
+                  backgroundColor: snackbar.severity === 'success' ? '#4CAF50' : '#444', // Ensure contrast with red background
+                  color: '#fff',
+                  fontWeight: 'bold',
+                }}
+              >
+                {snackbar.message}
+              </Alert>
+            </Snackbar>
       </Main>
     </Box>
   );

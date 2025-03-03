@@ -46,7 +46,7 @@ const NewsletterList = () => {
   useEffect(() => {
     const fetchNewsletters = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/latest-newsletters");
+        const response = await axios.get("http://127.0.0.1:8000/api/landing-newsletters");
         if (response.data?.latest_newsletters) {
           setNewsletters(response.data.latest_newsletters);
           setTimeout(() => {
@@ -129,19 +129,19 @@ const NewsletterList = () => {
                 />
 
                 <CardContent sx={{ textAlign: "center" }}>
-                  <Typography variant="h6" fontWeight="bold" color="primary">
+                  <Typography variant="h6" fontWeight="bold" color="#001219">
                     {newsletter.filename.replace(".md", "").replace(/_/g, " ")}
                   </Typography>
                   <Button
                     variant="contained"
                     sx={{
                       mt: 2,
-                      background: "linear-gradient(45deg, #42A5F5, #64B5F6)",
+                      bgcolor: "#FF4D4D",
                       color: "#fff",
                       borderRadius: 2,
                       fontWeight: "bold",
                       "&:hover": {
-                        background: "linear-gradient(45deg, #2196F3, #42A5F5)",
+                        background: "linear-gradient(45deg, #FF3D00, #FF6D00)",
                       },
                     }}
                   >

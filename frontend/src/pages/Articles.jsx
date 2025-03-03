@@ -3,12 +3,7 @@ import { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import ReactMarkdown from 'react-markdown';
 import {
-  Box,
-  Drawer,
-  AppBar,
-  Toolbar,
-  List,
-  Typography,
+  Box,Drawer,AppBar,Toolbar,List,Typography,Snackbar,Alert,
   Divider,
   IconButton,
   ListItem,
@@ -114,6 +109,8 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 export default function Articles() {
   const [open, setOpen] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const [selectedArticle, setSelectedArticle] = useState(null);
   const [dashboardData, setDashboardData] = useState({
     total_newsletters: 0,
@@ -140,6 +137,16 @@ export default function Articles() {
     }
   };
 
+  const handleOpenDeleteDialog = (article) => {
+    setSelectedArticle(article);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+    setSelectedArticle(null);
+  };
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -159,12 +166,42 @@ export default function Articles() {
       console.error('Logout failed:', error);
     }
     localStorage.removeItem('authToken');
+
     navigate('/login');
   };
 
   const handleViewArticle = (article) => {
     setSelectedArticle(article);
     setOpenDialog(true);
+  };
+
+  const handleDeleteArticle = async () => {
+    if (!selectedArticle) return;
+    
+    try {
+      const token = localStorage.getItem("authToken");
+
+      // Send DELETE request with created_at as a query parameter
+      await axios.delete(`http://127.0.0.1:8000/api/dashboard/${selectedArticle.filename}/`, {
+        headers: { Authorization: `Token ${token}` },
+        params: { created_at: selectedArticle.created_at },  // Pass created_at for uniqueness
+      });
+
+      // Update state to remove only the deleted article
+      setDashboardData((prevData) => ({
+        ...prevData,
+        articles: prevData.articles.filter(
+          (a) => !(a.filename === selectedArticle.filename && a.created_at === selectedArticle.created_at)
+        ),
+      }));
+
+      setSnackbar({ open: true, message: "Article deleted successfully.", severity: "success" });
+    } catch (error) {
+      console.error("Error deleting article:", error);
+      setSnackbar({ open: true, message: "Failed to delete the article. Please try again.", severity: "error" });
+    }
+
+    handleCloseDeleteDialog();
   };
 
   const handleCloseDialog = () => {
@@ -260,7 +297,7 @@ export default function Articles() {
             <TableRow>
               <TableCell>Filename</TableCell>
               <TableCell>Created At</TableCell>
-              <TableCell>Action</TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -271,6 +308,9 @@ export default function Articles() {
                 <TableCell>
                   <Button variant="contained" color="primary" onClick={() => handleViewArticle(article)}>
                     View
+                  </Button>
+                  <Button variant="contained" color="secondary" onClick={() => handleOpenDeleteDialog(article)} sx={{ ml: 2 }}>
+                    Delete
                   </Button>
                 </TableCell>
               </TableRow>
@@ -292,7 +332,47 @@ export default function Articles() {
           </Button>
         </DialogActions>
       </Dialog>
-        </Container>
+
+      {/* Material UI Confirmation Dialog */}
+      <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent><Typography>Are you sure you want to delete this article?</Typography></DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog} color="primary">Cancel</Button>
+          <Button onClick={handleDeleteArticle} color="secondary">Delete</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar for Feedback */}
+      <Snackbar
+          open={snackbar.open}
+          autoHideDuration={3000}
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }} // Position it at the top right
+          sx={{
+            '& .MuiSnackbarContent-root': {
+              backgroundColor: snackbar.severity === 'success' ? '#4CAF50' : '#333', // Green for success, dark gray for others
+              color: '#fff', // White text for contrast
+              fontWeight: 'bold',
+              borderRadius: '8px',
+              boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
+            },
+          }}
+        >
+          <Alert
+            onClose={() => setSnackbar({ ...snackbar, open: false })}
+            severity={snackbar.severity}
+            sx={{
+              backgroundColor: snackbar.severity === 'success' ? '#4CAF50' : '#444', // Ensure contrast with red background
+              color: '#fff',
+              fontWeight: 'bold',
+            }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+
+      </Container>
       </Main>
     </Box>
   );

@@ -9,7 +9,6 @@ import {
   Button,
   TextField,
   Toolbar,
-  Paper,
   MenuItem,
   Select,
   FormControl,
@@ -104,14 +103,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   color: colorPalette.text, // Apply white text color
 }));
 
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(2),
-  display: 'flex',
-  flexDirection: 'column',
-  height: 240,
-  backgroundColor: colorPalette.gradient.end, // Apply gradient end color to Paper
-  color: colorPalette.text, // Apply white text color
-}));
 
 // Axios instance with interceptor for Authorization
 const api = axios.create({
@@ -194,7 +185,6 @@ export default function Settings() {
     try {
       await api.post("news-gen/", { topic });
       setStatusMessage("News generated successfully!");
-      alert("News generated successfully!");
     } catch (error) {
       console.error("Error generating news:", error);
       setStatusMessage("Failed to generate news.");
@@ -211,7 +201,6 @@ export default function Settings() {
     try {
       await api.get("fetch-newsletters/");
       setStatusMessage("News saved to the database successfully!");
-      alert("News saved to the database successfully!");
     } catch (error) {
       console.error("Error saving news:", error);
       setStatusMessage("Failed to save news.");
@@ -277,13 +266,12 @@ const handleSendLatestNewsletter = async () => {
     setLoading(true);
     setStatusMessage(`Updating news for '${formattedTopic}.md'...`);
     try {
-      await api.post("news-gen/", { topic: `${formattedTopic}.md` });
-      await api.get("fetch-newsletters/");
-      const response = await api.post("latest-newsletter/", { topic: `${formattedTopic}.md` });
+      await api.post("news-gen/", { topic: `${formattedTopic}` });
+      await api.get("upload-newsletters/");
+      const response = await api.post("send-latest-newsletter/", { topic: `${formattedTopic}.md` });
       
-      const message = `Updated news sent for ${formattedTopic}.md to:\n${response.data.sent_to?.join("\n") || "No recipients"}`;
+      const message = `Updated news sent for ${formattedTopic} to:\n${response.data.sent_to?.join("\n") || "Sent to recipients"}`;
       setStatusMessage(message);
-      alert(message);
     } catch (error) {
       console.error("Error updating news:", error);
       setStatusMessage("Failed to update news.");
