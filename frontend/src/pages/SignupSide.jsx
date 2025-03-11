@@ -10,15 +10,11 @@ import LockOutlined from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 import { Alert } from "@mui/material";
 import { motion } from "framer-motion";
 import newscrew from "../assets/newscrew.jpg";
 
-const api = axios.create({
-  baseURL: "http://127.0.0.1:8000/api",
-  headers: { "Content-Type": "application/json" },
-});
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("authToken");
@@ -56,7 +52,7 @@ export default function SignupSide() {
     setLoading(true);
 
     try {
-      const response = await api.post("/signup/", formData);
+      const response = await api.post("api/signup/", formData);
       localStorage.setItem("authToken", response.data.token);
       navigate("/dashboard");
     } catch (err) {

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import axios from "axios";
+import api from "../api";
 import {
   Grid,
   Card,
@@ -46,7 +46,7 @@ const NewsletterList = () => {
   useEffect(() => {
     const fetchNewsletters = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/landing-newsletters");
+        const response = await api.get("api/landing-newsletters");
         if (response.data?.latest_newsletters) {
           setNewsletters(response.data.latest_newsletters);
           setTimeout(() => {

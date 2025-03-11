@@ -2,12 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Alert, Box, Button, Paper, TextField, Typography } from "@mui/material";
 import LockResetIcon from "@mui/icons-material/LockReset";
-import axios from "axios";
-
-const api = axios.create({
-  baseURL: "http://127.0.0.1:8000/api",
-  headers: { "Content-Type": "application/json" },
-});
+import api from "../api";
 
 export default function ResetPassword() {
   const { uid, token } = useParams(); // Get UID and token from URL
@@ -28,7 +23,7 @@ export default function ResetPassword() {
     setMessage("");
 
     try {
-      await api.post(`/password-reset-confirm/${uid}/${token}/`, { password: newPassword });
+      await api.post(`api/password-reset-confirm/${uid}/${token}/`, { password: newPassword });
       setMessage("✅ Password successfully reset! Redirecting to login...");
       setTimeout(() => navigate("/login"), 3000); // Redirect after success
     } catch (err) {

@@ -9,16 +9,13 @@ import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import axios from "axios";
+import api from "../api";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import newscrew1 from "../assets/newscrew1.jpg";
 
-const api = axios.create({
-  baseURL: "http://127.0.0.1:8000/api",
-  headers: { "Content-Type": "application/json" },
-});
+
 
 export default function SigninSide() {
   const navigate = useNavigate();
@@ -41,7 +38,8 @@ export default function SigninSide() {
     setLoading(true);
 
     try {
-      const response = await api.post("/login/", formData);
+      const response = await api.post("api/login/", formData);
+      console.log(response.data);
       localStorage.setItem("authToken", response.data.token);
       if (response.data.user.email === "gunasantosh999@gmail.com"){
         navigate("/dashboard");
@@ -60,10 +58,11 @@ export default function SigninSide() {
     setResetMessage("");
     setResetLoading(true);
     try {
-      await api.post("http://127.0.0.1:8000/api/password-reset/", { email: resetEmail });
+      await api.post("api/password-reset/", { email: resetEmail });
       setResetMessage("✅ Password reset link sent to your email.");
     } catch (err) {
       setResetMessage("❌ Failed to send reset link. Please check your email.");
+      console.error(err);
     } finally {
       setResetLoading(false);
     }

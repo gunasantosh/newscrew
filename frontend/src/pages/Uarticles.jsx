@@ -29,7 +29,7 @@ import {
   Logout as LogoutIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 
 // Extracted Color Palette
 const colorPalette = {
@@ -127,7 +127,7 @@ export default function Uarticles() {
     try {
       const token = localStorage.getItem('authToken');
       console.log(token);
-      const response = await axios.get('http://127.0.0.1:8000/api/fetch-articles/', {
+      const response = await api.get('api/fetch-articles/', {
         headers: { Authorization: `Token ${token}` }
       });
   
@@ -152,7 +152,7 @@ export default function Uarticles() {
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://127.0.0.1/api/user/logout', {}, {
+      await api.post('api/user/logout', {}, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`
         }

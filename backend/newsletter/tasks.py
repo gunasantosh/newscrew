@@ -65,6 +65,8 @@ class NewsletterTasks:
                    - A concise summary\n
                    - A bulleted list of 5 key insights\n
                    - The source URL\n
-                Ensure the final output is clean, visually appealing, and does not contain any '```' characters. """
+                Important Note:
+                1) The final output should not contain "```" (backticks) characters.\n
+                2) The newsletter should be visually appealing and easy to read.\n"""
             ),
         )

@@ -18,9 +18,9 @@ tasks = NewsletterTasks()
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY") 
-# llm = ChatOpenAI(temperature=0, model="gpt-4o", api_key=OPENAI_API_KEY)  # gpt-4 or 4o preferred
+llm = ChatOpenAI(temperature=0, model="gpt-4o", api_key=OPENAI_API_KEY)  # gpt-4 or 4o preferred
 # llm = ChatDeepSeek(model='deepseek-chat', api_key=DEEPSEEK_API_KEY)
-llm = LLM(model='deepseek/deepseek-chat', api_key=DEEPSEEK_API_KEY)
+# llm = LLM(model='deepseek/deepseek-chat', api_key=DEEPSEEK_API_KEY)
 
 
 # Define agents

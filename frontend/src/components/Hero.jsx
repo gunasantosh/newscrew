@@ -1,5 +1,5 @@
 import { Alert, Box, Button, TextField, Typography } from "@mui/material";
-import axios from "axios";
+import api from "../api";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import heroVideo from "../assets/hero_background.mp4";
@@ -28,7 +28,7 @@ const Hero = () => {
 
     if (!newErrors.email && !newErrors.topic) {
       try {
-        const response = await axios.post("http://127.0.0.1:8000/api/subscribe/", { email, topic });
+        const response = await api.post("api/subscribe/", { email, topic });
 
         if (response.status === 201) {
           setMessage("Successfully subscribed!");

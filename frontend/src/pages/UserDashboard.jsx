@@ -26,7 +26,7 @@ import {
   Dashboard as DashboardIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 
 // Extracted Color Palette
 const colorPalette = {
@@ -122,7 +122,7 @@ export default function UserDashboard() {
   
   const fetchUserData = async () => {
     try {
-      const response = await axios.get('http://127.0.0.1:8000/api/user/profile', {
+      const response = await api.get('api/user/profile', {
         headers: {
           Authorization: `Token ${localStorage.getItem('authToken')}`
         }
@@ -149,7 +149,7 @@ export default function UserDashboard() {
   const fetchDashboardData = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await axios.get('http://127.0.0.1:8000/api/update_user_topic/', {
+      const response = await api.get('api/update_user_topic/', {
         headers: {
           Authorization: `Token ${token}`
         }
@@ -169,18 +169,10 @@ export default function UserDashboard() {
   };
 
   const handleLogout = async () => {
-    try {
-      await axios.post('http://127.0.0.1/api/user/logout', {}, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`
-        }
-      });
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
     localStorage.removeItem('authToken');
     navigate('/login');
   };
+  
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/udashboard' },

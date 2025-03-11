@@ -11,7 +11,7 @@ import {
   Settings as SettingsIcon, Logout as LogoutIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 
 // Color Palette
 const colorPalette = {
@@ -86,7 +86,7 @@ export default function Usettings() {
   const fetchUserTopic = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await axios.get('http://127.0.0.1:8000/api/update_user_topic/', {
+      const response = await api.get('api/update_user_topic/', {
         headers: { Authorization: `Token ${token}` }
       });
       setCurrentTopic(response.data.topic);
@@ -98,8 +98,8 @@ export default function Usettings() {
   const handleUpdateTopic = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await axios.post(
-        'http://127.0.0.1:8000/api/update_user_topic/',
+      const response = await api.post(
+        'api/update_user_topic/',
         { topic: newTopic },
         { headers: { Authorization: `Token ${token}` } }
       );

@@ -25,7 +25,7 @@ import {
   Logout as LogoutIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 
 // Extracted Color Palette
 const colorPalette = {
@@ -128,7 +128,7 @@ export default function Articles() {
   const fetchDashboardData = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await axios.get('http://127.0.0.1:8000/api/dashboard/', {
+      const response = await api.get('api/dashboard/', {
         headers: { Authorization: `Token ${token}` }
       });
       setDashboardData(response.data);
@@ -157,7 +157,7 @@ export default function Articles() {
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://127.0.0.1/api/user/logout', {}, {
+      await api.post('api/user/logout', {}, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`
         }
@@ -182,7 +182,7 @@ export default function Articles() {
       const token = localStorage.getItem("authToken");
 
       // Send DELETE request with created_at as a query parameter
-      await axios.delete(`http://127.0.0.1:8000/api/dashboard/${selectedArticle.filename}/`, {
+      await api.delete(`api/dashboard/${selectedArticle.filename}/`, {
         headers: { Authorization: `Token ${token}` },
         params: { created_at: selectedArticle.created_at },  // Pass created_at for uniqueness
       });

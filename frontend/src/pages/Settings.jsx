@@ -33,7 +33,7 @@ import {
   Logout as LogoutIcon,
   Menu as MenuIcon,
 } from "@mui/icons-material";
-import axios from "axios";
+import api from "../api";
 import { useNavigate } from 'react-router-dom';
 
 const drawerWidth = 240;
@@ -104,10 +104,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 }));
 
 
-// Axios instance with interceptor for Authorization
-const api = axios.create({
-  baseURL: "http://127.0.0.1:8000/api/",
-});
 
 api.interceptors.request.use(
   (config) => {
@@ -140,7 +136,7 @@ export default function Settings() {
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://127.0.0.1/api/user/logout', {}, {
+      await api.post('api/user/logout', {}, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`
         }
@@ -163,7 +159,7 @@ export default function Settings() {
   useEffect(() => {
     const fetchTopics = async () => {
       try {
-        const response = await api.get("fetch-topics/");
+        const response = await api.get("api/fetch-topics/");
         setTopics(response.data.topics || []);
       } catch (error) {
         console.error("Error fetching topics:", error);
@@ -183,7 +179,7 @@ export default function Settings() {
     setLoading(true);
     setStatusMessage("Generating news...");
     try {
-      await api.post("news-gen/", { topic });
+      await api.post("api/news-gen/", { topic });
       setStatusMessage("News generated successfully!");
     } catch (error) {
       console.error("Error generating news:", error);
@@ -199,7 +195,7 @@ export default function Settings() {
     setLoading(true);
     setStatusMessage("Saving news to database...");
     try {
-      await api.get("upload-newsletters/");
+      await api.get("api/upload-newsletters/");
       setStatusMessage("News saved to the database successfully!");
     } catch (error) {
       console.error("Error saving news:", error);
@@ -215,7 +211,7 @@ const handleSendLatestNewsletter = async () => {
   setLoading(true);
   setStatusMessage("Sending latest newsletter...");
   try {
-    const response = await api.post("send-latest-newsletter/");
+    const response = await api.post("api/send-latest-newsletter/");
     const sentCount = response.data.sent_count || 0; // Get the number of emails sent
     const message = `Newsletter sent successfully to ${sentCount} subscribers.`;
     
@@ -242,7 +238,7 @@ const handleSendLatestNewsletter = async () => {
     setLoading(true);
     setStatusMessage(`Sending newsletter for '${selectedTopic}'...`);
     try {
-      const response = await api.post("send-newsletter/", { filename: selectedTopic });
+      const response = await api.post("api/send-newsletter/", { filename: selectedTopic });
       const message = `Newsletter sent for '${selectedTopic}' to:\n${response.data.sent_to?.join("\n") || "No recipients"}`;
       setStatusMessage(message);
       alert(message);
@@ -266,9 +262,9 @@ const handleSendLatestNewsletter = async () => {
     setLoading(true);
     setStatusMessage(`Updating news for '${formattedTopic}.md'...`);
     try {
-      await api.post("news-gen/", { topic: `${formattedTopic}` });
-      await api.get("upload-newsletters/");
-      const response = await api.post("send-latest-newsletter/", { topic: `${formattedTopic}.md` });
+      await api.post("api/news-gen/", { topic: `${formattedTopic}` });
+      await api.get("api/upload-newsletters/");
+      const response = await api.post("api/send-latest-newsletter/", { topic: `${formattedTopic}.md` });
       
       const message = `Updated news sent for ${formattedTopic} to:\n${response.data.sent_to?.join("\n") || "Sent to recipients"}`;
       setStatusMessage(message);

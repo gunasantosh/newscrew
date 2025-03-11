@@ -5,6 +5,8 @@ class Newsletter(models.Model):
     filename = models.CharField(max_length=255)  # Topic name
     content = models.TextField()  # Stores large markdown content
     created_at = models.DateTimeField()  # Auto-generates timestamp
+    
+    # Combination of filename and created_at is primary key
 
     class Meta:
         unique_together = ('filename', 'created_at')  # Prevents duplicate newsletters
@@ -17,7 +19,7 @@ class Newsletter(models.Model):
 
 
 class Subscription(models.Model):
-    email = models.EmailField()  # Allows multiple topic subscriptions per email
+    email = models.EmailField()  # Allows multiple topic subscriptions per email (Pk)
     topic = models.CharField(max_length=255)
 
     class Meta:
