@@ -1,16 +1,16 @@
-# Use official Node.js image with your specified version
+# Use official Node.js image
 FROM node:20.14.0-alpine AS build
 
 # Set the working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json to install dependencies
+# Copy package.json and package-lock.json first to ensure proper installation
 COPY package.json package-lock.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy the entire project to the container
+# Copy the entire project after installing dependencies
 COPY . .
 
 # Build the Vite project
