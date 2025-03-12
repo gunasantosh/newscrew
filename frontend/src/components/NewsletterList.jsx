@@ -46,7 +46,7 @@ const NewsletterList = () => {
   useEffect(() => {
     const fetchNewsletters = async () => {
       try {
-        const response = await api.get("api/landing-newsletters");
+        const response = await api.get("api/landing-newsletters/");
         if (response.data?.latest_newsletters) {
           setNewsletters(response.data.latest_newsletters);
           setTimeout(() => {

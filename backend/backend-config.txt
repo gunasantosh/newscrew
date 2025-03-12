@@ -1,0 +1,17 @@
+================================================================================
+                                    backend                                     
+================================================================================
+
+-------------------------------------------------------------------------------
+Environment: Development
+-------------------------------------------------------------------------------
+ServiceURL      : https://96d3e9c8-2a32-4a33-abdd-c3b42b4496ee-dev.e1-eu-north-azure.choreoapis.dev/newscrew/backend/v1
+ChoreoAPIKey    : chk_eyJjb25uZWN0aW9uLWlkIjoiMDFlZmZmMDItYjA5ZS0xZjY4LTg5NWEtZGQ1NzQwMjRmMDAzIn0=5dM0lA
+
+-------------------------------------------------------------------------------
+Environment: Production
+-------------------------------------------------------------------------------
+ServiceURL      : 
+ChoreoAPIKey    : chk_eyJjb25uZWN0aW9uLWlkIjoiMDFlZmZmMDItYjA5ZS0xZjY4LTg5NWEtZGQ1NzQwMjRmMDAzIn0=5dM0lA
+
+================================================================================
