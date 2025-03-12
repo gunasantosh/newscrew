@@ -1,25 +1,22 @@
 # Use official Node.js image
 FROM node:20.14.0-alpine AS build
 
-# Set the working directory
+# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json first to ensure proper installation
+# Copy package.json first, then install dependencies
 COPY package.json package-lock.json ./
-
-# Install dependencies
 RUN npm install
 
-# Copy the entire project after installing dependencies
+# Copy remaining project files and build
 COPY . .
-
-# Build the Vite project
 RUN npm run build
 
-# Use an official Nginx image to serve the built files
-FROM nginx:alpine
+# Debug: Check if the dist folder exists
+RUN ls -l /app/dist
 
-# Copy built files from the previous stage
+# Use Nginx to serve the built files
+FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Expose port 80
